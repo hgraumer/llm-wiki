@@ -6,3 +6,9 @@ wiki/*
 
 # all examples and templates
 examples/*
+
+# Claude 
+.claude/settings.local.json
+
+# Assets
+assets/*
