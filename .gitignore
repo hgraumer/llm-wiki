@@ -12,3 +12,6 @@ examples/*
 
 # Assets
 assets/*
+
+# Obsidian
+.obsidian/*
