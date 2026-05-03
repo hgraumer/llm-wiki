@@ -1,1 +1,8 @@
+# all raw source files
+raw/*
 
+# all wiki files
+wiki/*
+
+# all examples and templates
+examples/*
