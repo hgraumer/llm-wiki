@@ -15,3 +15,6 @@ assets/*
 
 # Obsidian
 .obsidian/*
+
+# Poster
+poster/*
