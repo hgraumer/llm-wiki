@@ -12,16 +12,22 @@ You are a highly rewarded lecturer with excellent teaching skills, able to prese
 
 Generate a professional HTML teaching poster. User notes: $ARGUMENTS
 
-The poster is a **React-based interactive editor** — a single self-contained HTML file in the `poster/` directory. No build step needed (React/Babel loaded via CDN). The user can visually adjust the layout in their browser, then export the config back to Claude for further changes.
+The poster is a **React-based interactive editor** — a single self-contained HTML file. No build step needed (React/Babel loaded via CDN). The user can visually adjust the layout in their browser, then export the config back to Claude for further changes.
+
+Each poster lives in its own subfolder under `poster/` so finished posters are preserved.
 
 ## Project folder structure
 
 ```
 <project>/
 ├── poster/
-│   ├── index.html         # The poster (React app)
-│   ├── poster-config.json # Layout config (columns, card order, heights, font scale)
-│   └── *.png              # Any referenced images
+│   ├── attention-transformers/   # one subfolder per poster
+│   │   ├── index.html
+│   │   ├── poster-config.json
+│   │   └── *.png
+│   ├── backpropagation/
+│   │   └── index.html
+│   └── ...
 └── .claude/skills/make-poster/
 ```
 
@@ -30,6 +36,8 @@ The poster is a **React-based interactive editor** — a single self-contained H
 1. **Topic** — what concept/paper should the poster explain?
 2. **Scope** — if broad, ask the user to narrow it before proceeding.
 3. **Format** — if not specified, ask: poster dimensions (default A2 landscape = 594×420mm), number of columns (default 2).
+
+Derive a short kebab-case folder name from the topic (e.g. `attention-transformers`, `backpropagation`, `fourier-transforms`). All output files go into `poster/<slug>/`.
 
 ## Process
 
@@ -255,10 +263,12 @@ After generating, use Playwright to measure whitespace and bake optimal dimensio
 from playwright.sync_api import sync_playwright
 import os
 
+SLUG = 'your-poster-slug'  # replace with actual slug
+
 with sync_playwright() as p:
     browser = p.chromium.launch()
     page = browser.new_page(viewport={'width': 3200, 'height': 2260})
-    page.goto('file://' + os.path.abspath('poster/index.html'))
+    page.goto('file://' + os.path.abspath(f'poster/{SLUG}/index.html'))
     page.wait_for_load_state('networkidle')
     page.wait_for_timeout(3000)
 

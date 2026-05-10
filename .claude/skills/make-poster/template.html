@@ -347,7 +347,7 @@ const DEFAULT_FONT_SCALE = 1.3;
 function cloneLayout(layout){
   return { columns: layout.columns.map(c=>({id:c.id,widthMm:c.widthMm,cards:[...c.cards]})) };
 }
-const LS_KEY = 'posterConfig';
+const LS_KEY = 'posterConfig_SLUG';  /* CUSTOMIZE: replace SLUG with the poster's folder name */
 function getFullConfig(layout,cardHeights,fontScale,logos){
   return { columns:layout.columns, cardHeights, fontScale, logos };
 }
