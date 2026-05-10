@@ -238,7 +238,6 @@ git push -u origin main
 - **Match the reference style.** If the reference poster is light/clean, don't use a dark theme. Match the overall aesthetic.
 - **Font scaling.** All text sizes use `calc(Xpt * var(--font-scale))` so the A-/A+ buttons work. Start with `--font-scale: 1.3` and let the user adjust.
 - **Print-optimized CSS.** `@media print` hides all edit UI and sets `transform: none !important`. `@page` sets exact dimensions.
-- **Posterskill QR.** Always include a QR code linking to `https://github.com/ethanweber/posterskill` in the header with the label "Poster made with my Claude skill".
 - **No acknowledgements footer.** Keep the poster clean — no footer by default.
 - **Logos in header.** Download institutional logos from the author's website, save to `poster/logos/`, and list them in `DEFAULT_LOGOS`. They're auto-inverted to white via CSS filter.
 - **Self-contained.** No build step, no npm, no server. Single HTML file with CDN dependencies. Works when opened directly as `file://`.
