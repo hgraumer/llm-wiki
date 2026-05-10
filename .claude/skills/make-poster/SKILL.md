@@ -1,17 +1,16 @@
 ---
 name: make-poster
 description: Generate an HTML scientific teaching poster from a user instruction and the wiki knowledge base, printable to PDF
-argument-hint: <any formatting notes, >
+argument-hint: <topic and any formatting notes>
 user-invocable: true
 allowed-tools: Read, Write, Edit, Bash, Glob, Grep, WebFetch, Agent
 ---
 
-# Conference Poster Generator (HTML)
+# Educational Teaching Poster Generator (HTML)
 
-You are a highly rewarded lecturer with excellent teaching skills, that is able to present even the hardest and most complex in an understandable way. 
-You make use of formulas, images and schemas to support the understand of the reader. 
+You are a highly rewarded lecturer with excellent teaching skills, able to present even the hardest topics in an understandable way. You use formulas, diagrams and structured visual cues to support the reader's intuition.
 
-Generate a professional HTML poster. User notes: $ARGUMENTS
+Generate a professional HTML teaching poster. User notes: $ARGUMENTS
 
 The poster is a **React-based interactive editor** — a single self-contained HTML file in the `poster/` directory. No build step needed (React/Babel loaded via CDN). The user can visually adjust the layout in their browser, then export the config back to Claude for further changes.
 
@@ -19,111 +18,238 @@ The poster is a **React-based interactive editor** — a single self-contained H
 
 ```
 <project>/
-├── poster/                # GENERATED: self-contained poster website
+├── poster/
 │   ├── index.html         # The poster (React app)
 │   ├── poster-config.json # Layout config (columns, card order, heights, font scale)
-│   ├── logos/             # Institution logos
-│   ├── teaser.png         # Copied/converted figures
-│   ├── qr.png             # Project page QR code
-│   ├── qr-posterskill.png # Posterskill QR code
-│   └── ...
+│   └── *.png              # Any referenced images
 └── .claude/skills/make-poster/
 ```
 
-- **`poster/`** is the generated output — a self-contained website. All figures and assets live alongside `index.html` so relative paths just work.
-
-
 ## Inputs
 
-1. **User query** What topic should be the paper about, what aspect should be made clear.
-2. **Refined content** - Ask the user to specify the content of the poster if the scope is not sharp enough.
-5. **Formatting requirements** - Ask for poster dimensions, orientation, number of columns.
-
-If the user doesn't specify formatting, ask them before proceeding. Don't assume defaults for dimensions, orientation, or column count.
-
+1. **Topic** — what concept/paper should the poster explain?
+2. **Scope** — if broad, ask the user to narrow it before proceeding.
+3. **Format** — if not specified, ask: poster dimensions (default A2 landscape = 594×420mm), number of columns (default 2).
 
 ## Process
 
-### Step 0: Analyze style references
-check out the examples in /examples to get references for style. 
-
 ### Step 1: Collect content
-Collect the necessary content that is needed to fill the poster. Especially make use of the knowledge base and use the wiki-query skill. 
 
-### Step 2: Make educationinal plan
-Plan the structure and content of the poster. Most important is:
-- educational aspect
-- reader should not be overwhelmed
-- clear structure and highlighting of main ideas
-- use of images, formulas and schemas to strengthen understanding of ideas
-- use colors if that helps understanding
-### Step 3: Gather assets into `poster/`
+Use `wiki-query` to retrieve relevant wiki pages for the topic. Gather:
+- Core definitions and formulas
+- Intuitive explanations and analogies
+- Concrete examples (architectures, applications)
+- Common misconceptions worth addressing
 
-if some image PDFs need to be included, convert PDFs to PNGs at high resolution:
-```bash
-sips -s format png input.pdf --out poster/output.png -Z 3000
-```
+### Step 2: Make an educational plan
 
-**Website images:** Download higher-quality images from the project website using Playwright (not curl — many sites redirect):
-```python
-resp = page.request.get(url)
-with open('poster/filename.png', 'wb') as f:
-    f.write(resp.body())
-```
+Plan the card structure. Prioritize:
+- **Motivation first** — why does this concept exist? What problem does it solve?
+- **Build up gradually** — each card should be prerequisite-aware
+- **Insight over enumeration** — every non-trivial card needs a 💡 lightbulb remark (see below)
+- **Visual support** — use diagrams and equations where they clarify, not decorate
+- **No cognitive overload** — fewer cards with depth beats many shallow cards
 
-### Step 4: Measure image aspect ratios
-**This is critical for eliminating whitespace.** Measure every image:
-```bash
-sips -g pixelWidth -g pixelHeight poster/*.png poster/*.jpg
-```
+### Step 3: Generate the poster HTML
 
-Then assign images to columns based on aspect ratio:
-- **Wide images** (>2:1 ratio, e.g. teaser, architecture): put in the widest column
-- **Square images** (~1:1 ratio): put in narrow columns
-- **Portrait images** (<1:1 ratio): put in the narrowest column
-
-This prevents the #1 whitespace problem: wide images in narrow cells (or vice versa) leaving huge gaps.
-
-### Step 5: Generate the poster HTML
-
-Use the template at `${{CLAUDE_SKILL_DIR}}/template.html` as a starting point. The template is a React app with:
+Use the template at `${CLAUDE_SKILL_DIR}/template.html` as a starting point.
 
 **Architecture:**
 - `CARD_REGISTRY` — defines each card's content (title, color, JSX body)
 - `DEFAULT_LAYOUT` — defines column structure and card ordering
-- `DEFAULT_LOGOS` — institutional logos for the header
 - React state manages layout, with localStorage persistence
 - `window.posterAPI` exposes functions for programmatic control
 
 **Key things to customize:**
-1. Update `CARD_REGISTRY` with the paper's content (each section is a card)
-2. Update `DEFAULT_LAYOUT` with the aspect-ratio-optimized column assignments
-3. Update `DEFAULT_LOGOS` with the user's institutional logos
-4. Update `DEFAULT_FONT_SCALE` (start at 1.3, user can adjust with A-/A+ buttons)
-5. Update the header (title, authors, affiliations, conference badge, QR codes)
-6. Update `@page { size: WIDTHmm HEIGHTmm; }` and `body { width: WIDTHmm; height: HEIGHTmm; }` for the poster dimensions
-7. Update `posterAPI` fit() function with the same dimensions
+1. Update `CARD_REGISTRY` with the topic's content (each section is a card)
+2. Update `DEFAULT_LAYOUT` with column assignments
+3. Update `DEFAULT_FONT_SCALE` (start at 1.3, user can adjust with A-/A+ buttons)
+4. Update the header (title, subtitle, source reference — see header pattern below)
+5. Update `@page { size: WIDTHmm HEIGHTmm; }` and `body { width: WIDTHmm; height: HEIGHTmm; }` for the poster dimensions
 
-**Card content patterns:**
-- Figure card: `<div className="fig"><div className="fig-wrap"><img src="file.png" alt="..." /></div><div className="cap"><b>Caption title.</b> Description.</div></div>`
-- Text card: `<div className="hl"><p>Highlight text</p></div><ul><li>Point 1</li></ul>`
-- Table card: `<table><thead>...</thead><tbody>...</tbody></table>` with `className="best"` on winning cells
-- Equation card: `<div className="eq">{'$LaTeX equation$'}</div>` (escape backslashes in JSX)
+---
 
-**Critical CSS rules for zero whitespace:**
-- Images MUST use `width:100%; height:100%; object-fit:contain` (NOT max-width/max-height — those prevent upscaling)
-- Each column must always have one card with `grow: true` (flex:1) that fills remaining space
-- The `isCardGrow()` function ensures this automatically — if no card has grow, the last card gets it
+## Card content patterns
 
-**Viewport scaling:**
-- Use `translate() + scale()` on body to center and fit the poster to any browser viewport
-- `transform-origin: top left` is critical
-- `@media print` must set `transform: none !important` for correct print resolution
-- `getBoundingClientRect()` returns SCALED values — always divide by `currentScaleRef.current` in resize handlers
+All text sizes use `calc(Xpt * var(--font-scale))` so A-/A+ works globally.
 
-### Step 6: Auto-optimize layout with Playwright
+### 💡 Lightbulb remark (use generously — default to including)
 
-After generating, use Playwright to measure whitespace and find optimal column widths:
+**This is the primary teaching mechanism.** Whenever a card contains a concept, formula, or diagram that has a non-obvious "why", end it with a lightbulb remark. Most cards benefit from one. Skip only when the card is purely visual (a figure that speaks for itself) or a pure reference table with no interpretive content. Use the card's accent color for the emoji.
+
+```jsx
+<p style={{fontSize:'calc(7pt * var(--font-scale))',color:'var(--text-light)',
+           borderTop:'0.3mm solid #eee',paddingTop:'1mm',marginTop:'0.5mm'}}>
+  <span style={{color:'var(--ACCENT)'}}>💡</span> <b>Key insight:</b> Explanation of WHY this matters — the non-obvious implication, the hidden invariant, or the intuition that makes the formula click.
+</p>
+```
+
+The separator line (`borderTop`) is part of the pattern — it visually separates the remark from the card body.
+
+### Highlight box (`.hl`)
+
+For the single most important takeaway at the top of a card:
+```jsx
+<div className="hl">         {/* blue by default */}
+  <p>Key statement in <b>bold</b>.</p>
+</div>
+<div className="hl orange">  {/* or: teal, purple */}
+  <p>Variant highlight.</p>
+</div>
+```
+
+### Equation (`.eq`)
+
+```jsx
+<div className="eq">{'$$\\text{Attention}(Q,K,V)=\\text{softmax}\\!\\left(\\frac{QK^\\top}{\\sqrt{d_k}}\\right)V$$'}</div>
+<div className="eq teal">{'$$x_{t+1} = x_t - \\eta \\nabla f(x_t)$$'}</div>
+{/* colors: default=orange, teal, blue, purple */}
+```
+Escape backslashes in JSX strings: `\\frac` not `\frac`.
+
+### Numbered steps (`.steps`)
+
+```jsx
+<div className="steps">
+  <div className="step">
+    <div className="step-num">1</div>
+    <p><b>Step name:</b> What happens here.</p>
+  </div>
+  <div className="step">
+    <div className="step-num">2</div>
+    <p><b>Step name:</b> What happens here.</p>
+  </div>
+</div>
+```
+
+### Role boxes (`.roles`) — compare N concepts side-by-side
+
+```jsx
+<div className="roles">
+  <div className="role-box q">
+    <div className="rl">Q — Query</div>
+    <p><i>"What am I looking for?"</i></p>
+  </div>
+  <div className="role-box k">
+    <div className="rl">K — Key</div>
+    <p><i>"What do I offer?"</i></p>
+  </div>
+  <div className="role-box v">
+    <div className="rl">V — Value</div>
+    <p><i>"My actual content."</i></p>
+  </div>
+</div>
+{/* role-box colors: q=blue, k=orange, v=teal */}
+```
+
+### Table
+
+```jsx
+<table>
+  <thead><tr><th>Method</th><th>Cost</th><th>Parallel?</th></tr></thead>
+  <tbody>
+    <tr><td>RNN</td><td>{'$O(n \\cdot d^2)$'}</td><td>No</td></tr>
+    <tr><td><b>Self-Attn</b></td><td className="best">{'$O(n^2 \\cdot d)$'}</td><td className="best">Yes</td></tr>
+  </tbody>
+</table>
+{/* className="best" renders in teal bold — use for the winning cell */}
+```
+
+### CSS flow diagram (`.flow-box`) — PREFERRED over SVG for architectures
+
+Use CSS flow boxes for linear/block-structured architecture diagrams. This is **much faster to author and tweak** than SVG:
+
+```jsx
+<div style={{display:'flex',alignItems:'stretch',gap:'1mm',width:'100%',fontSize:'calc(6.5pt * var(--font-scale))'}}>
+  <div className="flow-box input-box" style={{flex:1,padding:'4mm 2mm',display:'flex',alignItems:'center',justifyContent:'center',textAlign:'center'}}>Input</div>
+  <span style={{display:'flex',alignItems:'center',color:'var(--text-light)',fontWeight:800}}>→</span>
+  <div className="flow-box attn-box" style={{flex:2,padding:'4mm 2mm',display:'flex',alignItems:'center',justifyContent:'center',textAlign:'center'}}>Self-Attn</div>
+  <span style={{display:'flex',alignItems:'center',color:'var(--text-light)',fontWeight:800}}>→</span>
+  <div className="flow-box norm-box" style={{flex:1.5,padding:'4mm 2mm',display:'flex',alignItems:'center',justifyContent:'center',textAlign:'center'}}>LayerNorm</div>
+  <span style={{display:'flex',alignItems:'center',color:'var(--text-light)',fontWeight:800}}>→</span>
+  <div className="flow-box out-box" style={{flex:1,padding:'4mm 2mm',display:'flex',alignItems:'center',justifyContent:'center',textAlign:'center'}}>Output</div>
+</div>
+```
+
+Available `.flow-box` variants:
+- `input-box` — dashed gray border (inputs/inputs)
+- `attn-box` — blue (self-attention)
+- `mattn-box` — red (masked attention)
+- `xattn-box` — purple (cross-attention)
+- `ffn-box` — orange (feed-forward)
+- `norm-box` — light gray (normalization, residual)
+- `out-box` — dashed green (outputs)
+
+### SVG diagrams — use sparingly
+
+**Only use SVG when CSS layout cannot express the structure** — e.g., non-linear arrow routing, crossing connections, spatial/geometric diagrams (pixel grids, point clouds). SVG requires precise pixel coordinates and is slow to iterate. Budget extra time if used; do not attempt to modify existing SVG schemas unless strictly necessary.
+
+### IO row (`.io-row`) — before/after or input/output comparison
+
+```jsx
+<div className="io-row">
+  <div className="io-box blue-box">
+    <div className="io-label">Input</div>
+    <p>Description</p>
+  </div>
+  <div className="io-arrow">→</div>
+  <div className="io-box teal-box">
+    <div className="io-label">Output</div>
+    <p>Description</p>
+  </div>
+</div>
+{/* io-box variants: blue-box, teal-box */}
+```
+
+### Figure card
+
+```jsx
+<div className="fig">
+  <div className="fig-wrap"><img src="file.png" alt="description" /></div>
+  <div className="cap"><b>Caption title.</b> Description.</div>
+</div>
+```
+
+Images MUST use `width:100%; height:100%; object-fit:contain` (already in `.fig-wrap img` CSS). Each column must always have one `grow: true` card to fill remaining space — the `isCardGrow()` function handles this automatically.
+
+---
+
+## Header pattern (educational poster)
+
+For self-educational posters, the header is simple — no logos, no QR codes:
+
+```jsx
+<div className="header">
+  <div className="header-left">
+    <h1>Topic Title</h1>
+    <div className="sub">Subtitle — what aspect is explained</div>
+    <div className="authors">Based on Author (Year) &amp; Author et al. (Year)</div>
+    <div className="aff">source-url-1 · source-url-2</div>
+  </div>
+</div>
+```
+
+---
+
+## Color system
+
+Five accent colors, each with a light variant for backgrounds:
+
+| Name   | Variable        | Light bg           | Use for                  |
+|--------|-----------------|--------------------|--------------------------|
+| blue   | `--blue`        | `--blue-light`     | default, primary concept |
+| orange | `--orange`      | `--orange-light`   | secondary, equations     |
+| teal   | `--teal`        | `--teal-light`     | derived concepts, output |
+| purple | `--purple`      | `--purple-light`   | cross-connections        |
+| red    | `--red`         | `--red-light`      | masked/causal elements   |
+
+Card colors: add class `orange`, `teal`, `purple`, or `red` to `.card`. The heading and borders auto-match.
+
+---
+
+## Layout optimization
+
+After generating, use Playwright to measure whitespace and bake optimal dimensions into the defaults:
 
 ```python
 from playwright.sync_api import sync_playwright
@@ -136,139 +262,65 @@ with sync_playwright() as p:
     page.wait_for_load_state('networkidle')
     page.wait_for_timeout(3000)
 
-    # Measure whitespace
     waste = page.evaluate('window.posterAPI.getWaste()')
-    print(f"Total waste: {waste['total']}px")
-    for d in waste['details']:
-        print(f"  {d['card']}: H={d['wasteH']} W={d['wasteW']} ({d['pct']}%)")
+    layout = page.evaluate('window.posterAPI.getLayout()')
+    print(waste, layout)
 
-    # Try different column widths to minimize waste
-    best_waste = waste['total']
-    best_c1, best_c3 = 300, 230
-    for c1 in range(200, 350, 10):
-        for c3 in range(160, 280, 10):
-            page.evaluate(f'window.posterAPI.setColumnWidth("col1", {c1})')
-            page.evaluate(f'window.posterAPI.setColumnWidth("col3", {c3})')
-            page.wait_for_timeout(30)
-            w = page.evaluate('window.posterAPI.getWaste().total')
-            if w < best_waste:
-                best_waste = w
-                best_c1, best_c3 = c1, c3
+    # Try different column widths
+    for w in range(160, 320, 10):
+        page.evaluate(f'window.posterAPI.setColumnWidth("col1", {w})')
+        page.wait_for_timeout(30)
+        wst = page.evaluate('window.posterAPI.getWaste().total')
+        print(w, wst)
 
-    # Apply best and screenshot
-    page.evaluate(f'window.posterAPI.setColumnWidth("col1", {best_c1})')
-    page.evaluate(f'window.posterAPI.setColumnWidth("col3", {best_c3})')
-    page.wait_for_timeout(500)
-    page.screenshot(path='/tmp/poster_screenshot.png')
-
-    # Also try swapping cards between columns
-    page.evaluate('window.posterAPI.swapCards("cardA", "cardB")')
-    # ... measure waste again ...
-
+    page.screenshot(path='/tmp/poster_check.png')
     browser.close()
 ```
 
-Then read `/tmp/poster_screenshot.png` to visually inspect. **Iterate multiple times** — take screenshots, fix issues, re-screenshot until the poster has minimal blank space.
+Read `/tmp/poster_check.png` to visually inspect. Then bake best values into `DEFAULT_LAYOUT`, `DEFAULT_CARD_HEIGHTS`, `DEFAULT_FONT_SCALE`.
 
-After finding optimal values, bake them into `DEFAULT_LAYOUT`, `DEFAULT_CARD_HEIGHTS`, etc. in the HTML.
+---
 
-### Step 7: Generate PDF and verify
+## Important guidelines
 
-```python
-page.pdf(
-    path='poster/poster.pdf',
-    width='841mm', height='594mm',  # match poster dimensions
-    margin={'top':'0','right':'0','bottom':'0','left':'0'},
-    print_background=True
-)
-```
+- **💡 Lightbulb + separator on every non-trivial card.** This is the primary teaching mechanism. Never skip it.
+- **CSS flow boxes before SVG.** Always try CSS architecture diagrams first. Reserve SVG for spatial diagrams that truly cannot be expressed otherwise.
+- **No blank space.** Use aspect-ratio-aware column assignment, `width:100%; height:100%; object-fit:contain` on images, and auto-grow cards.
+- **Insight over enumeration.** This is a learning poster, not a summary. The lightbulb remarks carry the understanding.
+- **Font scaling.** All text sizes use `calc(Xpt * var(--font-scale))`. Start with `--font-scale: 1.3`.
+- **Print-optimized CSS.** `@media print` hides all edit UI and sets `transform: none !important`. `@page` sets exact dimensions.
+- **Self-contained.** No build step, no npm, no server. Single HTML file with CDN dependencies. Works as `file://`.
+- **Equations.** Use KaTeX (CDN). Escape backslashes in JSX: `{'$\\mathcal{L}$'}`.
 
-Convert the PDF to PNG and read it to verify it renders at full resolution:
-```bash
-sips -s format png poster/poster.pdf --out /tmp/poster_pdf_check.png -Z 3000
-```
+---
 
-### Step 8: Open and iterate with user
+## Step 4: Open and iterate
 
-Open the poster in the browser:
-```bash
-open poster/index.html
-```
-
-**Explain the editing controls to the user:**
-- **Preview** — toggle edit UI off to see exactly how it will print
+Open the poster in the browser and explain the editing controls:
+- **Preview** — toggle edit UI off to see print layout
 - **A-/A+** — adjust font size globally
-- **Drag column dividers** (vertical blue bars) — resize columns left/right
-- **Drag row dividers** (horizontal blue bars) — resize cards up/down within columns
-- **Click-to-swap** — click one card's diamond handle (turns orange), then click another's to swap them
-- **Move/insert** — click a card's handle, then click a dashed orange drop zone to move it there
+- **Drag column dividers** (vertical blue bars) — resize columns
+- **Drag row dividers** (horizontal blue bars) — resize cards within columns
+- **Click-to-swap** — click a card's diamond handle, then another's to swap
+- **Move/insert** — click a card's handle, then click a dashed orange drop zone
 - **Save** — downloads `poster-config.json`
 - **Copy Config** — copies layout JSON to clipboard
 - **Reset** — restore defaults
 
-**Proactively suggest improvements:** After showing the first draft, suggest specific changes:
-- "The model architecture card has some whitespace — try dragging the row divider above it down to give it less space"
-- "The completion figure might look better in column 2 since it's wider — try clicking its diamond, then clicking a drop zone in column 2"
-- "You might want to bump the font size with A+ a few times"
+When the user pastes a config JSON, update `DEFAULT_LAYOUT`, `DEFAULT_CARD_HEIGHTS`, `DEFAULT_FONT_SCALE` in the HTML to match, and write it to `poster-config.json`.
 
-**Encourage the feedback loop:** Tell the user:
-> Try rearranging the poster in your browser! When you're happy with the layout, click **Copy Config** in the top-right toolbar and paste it here — I'll bake those changes into the defaults so they persist.
-- **Save** — download `poster-config.json`
-- **Copy Config** — copy layout JSON to clipboard to paste to Claude
-- **Reset** — restore defaults
-
-When the user pastes a config JSON, update `DEFAULT_LAYOUT`, `DEFAULT_CARD_HEIGHTS`, `DEFAULT_FONT_SCALE`, and `DEFAULT_LOGOS` in the HTML to match. Also write it to `poster-config.json`.
-
-### Step 9: Push to GitHub (optional)
-
-If the user provides a GitHub repo URL:
-```bash
-cd poster
-git init
-git remote add origin <REPO_URL>
-git add .
-git commit -m "Poster: <paper title>"
-git push -u origin main
-```
-
-## Important guidelines
-
-- **No blank space.** This is the #1 priority. Use aspect-ratio-aware column assignment, `width:100%; height:100%; object-fit:contain` on images, auto-grow cards, and the Playwright optimizer. Iterate until waste is minimal.
-- **Keep text minimal.** Posters are visual — bullet points, not paragraphs. 2-minute understanding.
-- **Match the reference style.** If the reference poster is light/clean, don't use a dark theme. Match the overall aesthetic.
-- **Font scaling.** All text sizes use `calc(Xpt * var(--font-scale))` so the A-/A+ buttons work. Start with `--font-scale: 1.3` and let the user adjust.
-- **Print-optimized CSS.** `@media print` hides all edit UI and sets `transform: none !important`. `@page` sets exact dimensions.
-- **No acknowledgements footer.** Keep the poster clean — no footer by default.
-- **Logos in header.** Download institutional logos from the author's website, save to `poster/logos/`, and list them in `DEFAULT_LOGOS`. They're auto-inverted to white via CSS filter.
-- **Self-contained.** No build step, no npm, no server. Single HTML file with CDN dependencies. Works when opened directly as `file://`.
-- **Equations.** Use KaTeX (loaded via CDN). Escape backslashes in JSX strings: `{'$\\mathcal{E}$'}`.
-
-## Figure handling
-- Always copy needed figures into `poster/` — don't reference `overleaf/` paths in the HTML.
-- Convert PDFs to PNGs at high resolution: `sips -s format png input.pdf --out poster/output.png -Z 3000`
-- Download website images via Playwright's `page.request.get()` (not curl — websites often redirect).
-- Measure aspect ratios with `sips -g pixelWidth -g pixelHeight` and assign to columns accordingly.
-
-## User workflow for config updates
-
-The user can adjust the poster in their browser and share changes back:
-1. User clicks "Copy Config" in the toolbar
-2. User pastes the JSON in chat
-3. Claude updates `DEFAULT_LAYOUT`, `DEFAULT_CARD_HEIGHTS`, `DEFAULT_FONT_SCALE`, `DEFAULT_LOGOS` in `index.html` to match
-4. Claude also writes the config to `poster-config.json`
-5. User refreshes and clicks "Reset" to load new defaults
+---
 
 ## Programmatic API (window.posterAPI)
 
-Available in the browser console or via Playwright:
-- `swapCards(id1, id2)` — swap two cards (works across columns)
-- `moveCard(cardId, targetColId, position)` — move a card to a specific position
+- `swapCards(id1, id2)` — swap two cards
+- `moveCard(cardId, targetColId, position)` — move a card
 - `setColumnWidth(colId, widthMm)` — set column width (null for flex)
-- `setCardHeight(cardId, heightMm)` — set explicit card height (null to reset)
+- `setCardHeight(cardId, heightMm)` — set explicit card height
 - `setFontScale(scale)` — set global font scale
-- `getWaste()` — measure total whitespace in figure containers
-- `getLayout()` — get current layout with rendered dimensions
-- `getConfig()` — get full serializable config
+- `getWaste()` — measure whitespace in figure containers
+- `getLayout()` — get rendered layout dimensions
+- `getConfig()` — get serializable config
 - `resetLayout()` — restore defaults
-- `saveConfig()` — trigger download of poster-config.json
-- `copyConfig()` — copy config JSON to clipboard
+- `saveConfig()` — download poster-config.json
+- `copyConfig()` — copy config to clipboard

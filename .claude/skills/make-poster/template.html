@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PAPER_TITLE - CONF_NAME Poster</title>
+<title>TOPIC_TITLE</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
@@ -12,359 +12,459 @@
 <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 <script crossorigin src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 <style>
-  /* ============================================================
-     CUSTOMIZE: Update colors to match the reference poster style
-     ============================================================ */
   :root {
-    --blue: #2d7fc1; --blue-light: #e3f0fa;
-    --orange: #e8943a; --orange-light: #fdf0e0;
-    --teal: #2aaa8a; --purple: #7c5cbf; --red: #d94f4f;
-    --text: #222; --text-light: #555;
-    --bg: #f0ece6; --card-bg: #fff;
-    --gap: 3mm; --pad: 10mm;
-    --font-scale: 1.3;
+    --blue:#2d7fc1; --blue-light:#e3f0fa;
+    --orange:#e8943a; --orange-light:#fdf0e0;
+    --teal:#2aaa8a; --teal-light:#e0f5ef;
+    --purple:#7c5cbf; --purple-light:#f0eafa;
+    --red:#d94f4f; --red-light:#fdeaea;
+    --text:#222; --text-light:#555;
+    --bg:#f0ece6; --card-bg:#fff;
+    --gap:3mm; --pad:8mm;
+    --font-scale:1.3;
   }
 
-  /* ============================================================
-     CUSTOMIZE: Update poster dimensions (e.g. A1 landscape = 841mm 594mm)
-     ============================================================ */
-  @page { size: 841mm 594mm; margin: 0; }
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  html { font-family: 'Nunito', sans-serif; color: var(--text); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-  body { width: 841mm; height: 594mm; background: var(--bg); overflow: hidden; transform-origin: top left; }
-  #root { width: 100%; height: 100%; display: grid; grid-template-rows: auto 1fr; }
+  /* CUSTOMIZE: poster dimensions — A2 landscape = 594mm 420mm, A1 landscape = 841mm 594mm */
+  @page { size:594mm 420mm; margin:0; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html { font-family:'Nunito',sans-serif; color:var(--text); -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  body { width:594mm; height:420mm; background:var(--bg); overflow:hidden; transform-origin:top left; }
+  #root { width:100%; height:100%; display:grid; grid-template-rows:auto 1fr; }
   @media screen { html { background:#bbb; overflow:hidden; width:100vw; height:100vh; } body { position:absolute; box-shadow:0 4px 30px rgba(0,0,0,.3); border-radius:4px; } }
-  @media print { html { background:none; } body { position:static; transform:none!important; box-shadow:none; border-radius:0; } .toolbar,.divider,.swap-handle,.drop-zone{display:none!important;} }
-  body.preview .divider, body.preview .swap-handle, body.preview .drop-zone { display:none!important; }
+  @media print { html{background:none;} body{position:static;transform:none!important;box-shadow:none;border-radius:0;} .toolbar,.divider,.swap-handle,.drop-zone{display:none!important;} }
+  body.preview .divider,body.preview .swap-handle,body.preview .drop-zone{display:none!important;}
 
-  /* === HEADER === */
-  .header { background: linear-gradient(135deg,#1b4f7a,#2d7fc1 50%,#45a0e0); padding:6mm var(--pad) 5mm; display:flex; align-items:center; gap:8mm; }
-  .header-left { flex:1; }
-  .header h1 { font-size:34pt; font-weight:900; line-height:1.1; color:#fff; margin-bottom:2mm; }
-  .header h1 .m { color:#ffd060; }
-  .header .authors { font-size:18pt; color:rgba(255,255,255,.9); font-weight:700; }
-  .header .authors sup { font-size:11pt; color:#ffd060; }
-  .header .aff { font-size:15pt; color:rgba(255,255,255,.7); margin-top:1.5mm; }
-  .header .aff sup { color:#ffd060; font-size:10pt; }
-  .header-logos { display:flex; align-items:center; justify-content:center; gap:10mm; flex-shrink:0; }
-  .header-logos img { height:28mm; object-fit:contain; filter:brightness(0) invert(1); opacity:.85; }
-  .header-right { display:flex; flex-direction:row; align-items:center; gap:6mm; }
-  .badge { font-size:16pt; font-weight:900; color:#fff; background:rgba(255,255,255,.2); border:2px solid rgba(255,255,255,.5); padding:1.5mm 6mm; border-radius:2mm; }
-  .header-right .qr img { width:24mm; height:24mm; border-radius:1.5mm; background:#fff; padding:.8mm; }
-  .header-right .ql { font-size:8pt; color:#ffd060; font-weight:800; text-align:center; }
-  .header-right .qr { text-align:center; }
+  /* HEADER */
+  .header{background:linear-gradient(135deg,#1b4f7a,#2d7fc1 50%,#45a0e0);padding:4mm var(--pad) 3.5mm;display:flex;align-items:center;gap:6mm;}
+  .header-left{flex:1;}
+  .header h1{font-size:calc(22pt * var(--font-scale));font-weight:900;line-height:1.1;color:#fff;margin-bottom:.8mm;}
+  .header .sub{font-size:calc(12pt * var(--font-scale));font-weight:700;color:rgba(255,255,255,.8);margin-bottom:1.2mm;}
+  .header .authors{font-size:calc(10pt * var(--font-scale));color:rgba(255,255,255,.9);font-weight:700;}
+  .header .aff{font-size:calc(8.5pt * var(--font-scale));color:rgba(255,255,255,.65);margin-top:.5mm;}
 
-  /* === POSTER COLUMNS === */
-  .poster { display:flex; gap:var(--gap); padding:var(--gap) var(--pad); min-height:0; flex:1; overflow:hidden; }
-  .col { display:flex; flex-direction:column; gap:var(--gap); min-height:0; overflow:hidden; }
+  /* POSTER COLUMNS */
+  .poster{display:flex;gap:var(--gap);padding:var(--gap) var(--pad);min-height:0;flex:1;overflow:hidden;}
+  .col{display:flex;flex-direction:column;gap:var(--gap);min-height:0;overflow:hidden;}
 
-  /* === CARD === */
-  .card { background:var(--card-bg); border-radius:2.5mm; padding:3mm 4mm; box-shadow:0 1px 3px rgba(0,0,0,.08); border-top:2.5px solid var(--blue); display:flex; flex-direction:column; overflow:hidden; min-height:0; flex:0 0 auto; position:relative; transition: outline .15s; }
-  .card.grow { flex:1 1 0; }
-  .card.orange { border-top-color:var(--orange); }
-  .card.teal   { border-top-color:var(--teal); }
-  .card.purple { border-top-color:var(--purple); }
-  .card.red    { border-top-color:var(--red); }
-
-  .card h2 { font-size:calc(11pt * var(--font-scale)); font-weight:800; margin-bottom:1.5mm; flex-shrink:0; color:var(--blue); }
-  .card.orange h2{color:var(--orange);} .card.teal h2{color:var(--teal);} .card.purple h2{color:var(--purple);} .card.red h2{color:var(--red);}
-  .card p,.card li { font-size:calc(9.5pt * var(--font-scale)); line-height:1.3; }
-  .card ul,.card ol { padding-left:5mm; flex-shrink:0; }
-  .card li { margin-bottom:.8mm; }
-  .card li::marker { font-weight:700; }
+  /* CARD */
+  .card{--card-color:var(--blue);background:var(--card-bg);border-radius:2.5mm;padding:3mm 4mm;box-shadow:0 1px 3px rgba(0,0,0,.08);border-top:2.5px solid var(--card-color);border-left:1px solid var(--card-color);border-right:1px solid var(--card-color);border-bottom:1px solid var(--card-color);display:flex;flex-direction:column;overflow:hidden;min-height:0;flex:0 0 auto;position:relative;}
+  .card.grow{flex:1 1 0;}
+  .card.orange{--card-color:var(--orange);}
+  .card.teal{--card-color:var(--teal);}
+  .card.purple{--card-color:var(--purple);}
+  .card.red{--card-color:var(--red);}
+  .card.swap-selected{outline:3px solid var(--orange);outline-offset:-1px;}
+  .card h2{font-size:calc(10pt * var(--font-scale));font-weight:800;margin-bottom:1.5mm;flex-shrink:0;color:var(--blue);}
+  .card.orange h2{color:var(--orange);}.card.teal h2{color:var(--teal);}.card.purple h2{color:var(--purple);}.card.red h2{color:var(--red);}
+  .card p,.card li{font-size:calc(8.5pt * var(--font-scale));line-height:1.3;}
+  .card ul,.card ol{padding-left:5mm;flex-shrink:0;}
+  .card li{margin-bottom:.5mm;}
+  .card li::marker{font-weight:700;}
 
   /* Highlight box */
-  .hl { background:var(--blue-light); border-left:2.5px solid var(--blue); padding:2.5mm 3.5mm; border-radius:0 1.5mm 1.5mm 0; margin-bottom:1.5mm; flex-shrink:0; }
-  .hl p { font-size:calc(9.5pt * var(--font-scale)); line-height:1.35; font-weight:600; }
+  .hl{border-left:3px solid var(--blue);background:var(--blue-light);padding:2mm 3mm;border-radius:0 1.5mm 1.5mm 0;margin-bottom:1.5mm;flex-shrink:0;}
+  .hl.orange{border-left-color:var(--orange);background:var(--orange-light);}
+  .hl.teal{border-left-color:var(--teal);background:var(--teal-light);}
+  .hl.purple{border-left-color:var(--purple);background:var(--purple-light);}
+  .hl p{font-size:calc(8.5pt * var(--font-scale));line-height:1.3;font-weight:600;}
 
-  /* Figure — MUST use width/height 100% + object-fit:contain for zero whitespace */
-  .fig { flex:1; display:flex; flex-direction:column; min-height:0; margin:1mm 0; }
-  .fig-wrap { flex:1; display:flex; align-items:center; justify-content:center; min-height:0; overflow:hidden; }
-  .fig-wrap img { width:100%; height:100%; object-fit:contain; border-radius:1.5mm; display:block; }
-  .fig .cap { font-size:calc(7.5pt * var(--font-scale)); color:var(--text-light); margin-top:.8mm; line-height:1.2; flex-shrink:0; }
-  .fig .cap b { color:var(--text); }
+  /* Figure */
+  .fig{flex:1;display:flex;flex-direction:column;min-height:0;margin:.5mm 0;}
+  .fig-wrap{flex:1;display:flex;align-items:center;justify-content:center;min-height:0;overflow:hidden;}
+  .fig-wrap img{width:100%;height:100%;object-fit:contain;border-radius:1.5mm;display:block;}
+  .fig .cap{font-size:calc(7pt * var(--font-scale));color:var(--text-light);margin-top:.5mm;line-height:1.2;flex-shrink:0;}
+  .fig .cap b{color:var(--text);}
 
   /* Tables */
-  table { width:100%; border-collapse:collapse; font-size:calc(9pt * var(--font-scale)); margin:1.5mm 0; }
-  thead th { background:var(--blue); color:#fff; padding:1.5mm 2.5mm; text-align:left; font-weight:700; font-size:calc(8.5pt * var(--font-scale)); }
-  tbody td { padding:1.2mm 2.5mm; border-bottom:1px solid #eee; }
-  tbody tr:nth-child(even) { background:#f8f9fb; }
-  .best { font-weight:800; color:var(--orange); }
+  table{width:100%;border-collapse:collapse;font-size:calc(8pt * var(--font-scale));margin:1mm 0;flex-shrink:0;}
+  thead th{background:var(--blue);color:#fff;padding:1.2mm 2mm;text-align:left;font-weight:700;}
+  .card.orange table thead th{background:var(--orange);}
+  .card.teal   table thead th{background:var(--teal);}
+  .card.purple table thead th{background:var(--purple);}
+  .card.red    table thead th{background:var(--red);}
+  tbody td{padding:1mm 2mm;border-bottom:1px solid #eee;}
+  tbody tr:nth-child(even){background:#f8f9fb;}
+  td.best{font-weight:800;color:var(--teal);}
 
   /* Math */
-  .katex { font-size:calc(10pt * var(--font-scale))!important; }
-  .eq { background:var(--orange-light); border:1px solid var(--orange); border-radius:1.5mm; padding:1.5mm 2.5mm; margin:1.5mm 0; text-align:center; flex-shrink:0; }
+  .katex{font-size:calc(9pt * var(--font-scale))!important;}
+  .eq{background:var(--orange-light);border:1px solid var(--orange);border-radius:1.5mm;padding:1.5mm 2.5mm;margin:1mm 0;text-align:center;flex-shrink:0;}
+  .eq.teal{background:var(--teal-light);border-color:var(--teal);}
+  .eq.blue{background:var(--blue-light);border-color:var(--blue);}
+  .eq.purple{background:var(--purple-light);border-color:var(--purple);}
 
-  /* Links */
-  .links { display:flex; align-items:center; gap:3mm; background:var(--blue-light); padding:2.5mm 3.5mm; border-radius:1.5mm; margin-top:2mm; flex-shrink:0; }
-  .links .ll { font-size:calc(8.5pt * var(--font-scale)); line-height:1.5; }
-  .links .ll b { color:var(--blue); }
+  /* Role boxes — compare N concepts side-by-side */
+  .roles{display:flex;gap:2mm;margin:1.5mm 0;flex-shrink:0;}
+  .role-box{flex:1;border-radius:2mm;padding:2mm;}
+  .role-box.q{background:var(--blue-light);border:1.5px solid var(--blue);}
+  .role-box.k{background:var(--orange-light);border:1.5px solid var(--orange);}
+  .role-box.v{background:var(--teal-light);border:1.5px solid var(--teal);}
+  .role-box.pu{background:var(--purple-light);border:1.5px solid var(--purple);}
+  .role-box .rl{font-size:calc(9pt * var(--font-scale));font-weight:900;margin-bottom:.5mm;}
+  .role-box.q .rl{color:var(--blue);}
+  .role-box.k .rl{color:var(--orange);}
+  .role-box.v .rl{color:var(--teal);}
+  .role-box.pu .rl{color:var(--purple);}
+  .role-box p{font-size:calc(7.5pt * var(--font-scale));line-height:1.25;}
 
-  /* === TOOLBAR === */
-  .toolbar { position:fixed; top:8px; right:8px; z-index:1000; display:flex; gap:6px; align-items:center; }
-  .toolbar button { font-family:'Nunito'; font-size:11px; font-weight:700; padding:5px 12px; border-radius:6px; border:none; cursor:pointer; background:#eee; color:#555; }
-  .toolbar button:hover { background:#ddd; }
+  /* Numbered steps */
+  .steps{display:flex;flex-direction:column;gap:1mm;margin:1mm 0;flex-shrink:0;}
+  .step{display:flex;align-items:flex-start;gap:2mm;}
+  .step-num{width:5mm;height:5mm;min-width:5mm;border-radius:50%;background:var(--orange);color:#fff;font-weight:800;font-size:calc(8pt * var(--font-scale));display:flex;align-items:center;justify-content:center;margin-top:.3mm;}
+  .card.teal .step-num{background:var(--teal);}
+  .card.purple .step-num{background:var(--purple);}
+  .card.blue .step-num{background:var(--blue);}
+  .step p{font-size:calc(8pt * var(--font-scale));line-height:1.3;}
+
+  /* IO row — before/after or input/output comparison */
+  .io-row{display:flex;gap:2mm;margin:1.5mm 0;flex-shrink:0;}
+  .io-box{flex:1;border-radius:2mm;padding:2mm;text-align:center;}
+  .io-box .io-label{font-weight:800;font-size:calc(8.5pt * var(--font-scale));margin-bottom:.4mm;}
+  .io-box p{font-size:calc(7.5pt * var(--font-scale));line-height:1.25;}
+  .io-box.blue-box{background:var(--blue-light);border:1px solid var(--blue);}
+  .io-box.blue-box .io-label{color:var(--blue);}
+  .io-box.teal-box{background:var(--teal-light);border:1px solid var(--teal);}
+  .io-box.teal-box .io-label{color:var(--teal);}
+  .io-box.orange-box{background:var(--orange-light);border:1px solid var(--orange);}
+  .io-box.orange-box .io-label{color:var(--orange);}
+  .io-arrow{display:flex;align-items:center;color:var(--blue);font-weight:800;font-size:calc(16pt * var(--font-scale));}
+
+  /* CSS flow boxes — use these instead of SVG for architecture diagrams */
+  .flow-box{border-radius:2mm;padding:1.2mm 2mm;text-align:center;}
+  .flow-box.input-box{background:#eef2f7;border:1.5px dashed #aab;}
+  .flow-box.attn-box{background:var(--blue-light);border:1.5px solid var(--blue);color:var(--blue);font-weight:700;}
+  .flow-box.mattn-box{background:var(--red-light);border:1.5px solid var(--red);color:var(--red);font-weight:700;}
+  .flow-box.xattn-box{background:var(--purple-light);border:1.5px solid var(--purple);color:var(--purple);font-weight:700;}
+  .flow-box.ffn-box{background:var(--orange-light);border:1.5px solid var(--orange);color:var(--orange);font-weight:700;}
+  .flow-box.norm-box{background:#f5f5f5;border:1px solid #ccc;color:#666;}
+  .flow-box.out-box{background:#eef5ee;border:1.5px dashed #7aaa7a;color:#3a7a3a;font-weight:700;}
+  .flow-arrow{text-align:center;color:var(--text-light);line-height:1;}
+
+  /* TOOLBAR */
+  .toolbar{position:fixed;top:8px;right:8px;z-index:1000;display:flex;gap:6px;align-items:center;}
+  .toolbar button{font-family:'Nunito';font-size:11px;font-weight:700;padding:5px 12px;border-radius:6px;border:none;cursor:pointer;background:#eee;color:#555;}
+  .toolbar button:hover{background:#ddd;}
 
   /* Swap handles */
-  .card .swap-handle { position:absolute; top:1.5mm; right:1.5mm; width:8mm; height:8mm; background:var(--blue); color:#fff; border-radius:1.5mm; font-size:9pt; text-align:center; line-height:8mm; cursor:pointer; z-index:10; user-select:none; opacity:.4; transition: opacity .15s, background .15s, transform .15s; }
-  .card .swap-handle:hover { opacity:.8; transform:scale(1.15); }
-  .card.swap-selected { outline:3px solid var(--orange); outline-offset:-1px; }
-  .card.swap-selected .swap-handle { background:var(--orange); opacity:1; transform:scale(1.2); }
+  .card .swap-handle{position:absolute;top:1.5mm;right:1.5mm;width:7mm;height:7mm;background:var(--blue);color:#fff;border-radius:1.5mm;font-size:8pt;text-align:center;line-height:7mm;cursor:pointer;z-index:10;user-select:none;opacity:.35;transition:opacity .15s,background .15s,transform .15s;}
+  .card .swap-handle:hover{opacity:.8;transform:scale(1.15);}
+  .card.swap-selected .swap-handle{background:var(--orange);opacity:1;transform:scale(1.2);}
 
-  /* Dividers (same style for column and row) */
-  .divider { position:relative; z-index:50; flex-shrink:0; }
-  .divider::after { content:''; position:absolute; background:rgba(45,127,193,.12); border-radius:1.5mm; transition:background .15s; }
-  .divider:hover::after, .divider.active::after { background:rgba(45,127,193,.5); }
-  .col-resize { width:6mm; cursor:col-resize; margin:0 -3mm; }
-  .col-resize::after { top:0; bottom:0; left:1.5mm; width:3mm; }
-  .row-resize { height:6mm; cursor:row-resize; margin:-3mm 0; }
-  .row-resize::after { left:0; right:0; top:1.5mm; height:3mm; }
+  /* Dividers */
+  .divider{position:relative;z-index:50;flex-shrink:0;}
+  .divider::after{content:'';position:absolute;background:rgba(45,127,193,.12);border-radius:1.5mm;transition:background .15s;}
+  .divider:hover::after,.divider.active::after{background:rgba(45,127,193,.5);}
+  .col-resize{width:6mm;cursor:col-resize;margin:0 -3mm;}
+  .col-resize::after{top:0;bottom:0;left:1.5mm;width:3mm;}
+  .row-resize{height:6mm;cursor:row-resize;margin:-3mm 0;}
+  .row-resize::after{left:0;right:0;top:1.5mm;height:3mm;}
 
   /* Drop zones */
-  .drop-zone { height:0; position:relative; z-index:60; transition: height .15s; }
-  .drop-zone.visible { height:5mm; }
-  .drop-zone-inner { position:absolute; left:2mm; right:2mm; top:0; bottom:0; border-radius:1.5mm; background:rgba(232,148,58,.15); border:2px dashed var(--orange); transition: background .15s; cursor:pointer; }
-  .drop-zone-inner:hover { background:rgba(232,148,58,.35); }
+  .drop-zone{height:0;position:relative;z-index:60;transition:height .15s;}
+  .drop-zone.visible{height:5mm;}
+  .drop-zone-inner{position:absolute;left:2mm;right:2mm;top:0;bottom:0;border-radius:1.5mm;background:rgba(232,148,58,.15);border:2px dashed var(--orange);transition:background .15s;cursor:pointer;}
+  .drop-zone-inner:hover{background:rgba(232,148,58,.35);}
 </style>
 </head>
 <body>
 <div id="root"></div>
-
 <script type="text/babel">
 const { useState, useRef, useEffect, useCallback } = React;
 const MM = 3.7795275591;
-/* CUSTOMIZE: poster dimensions in mm */
-const POSTER_W_MM = 841;
-const POSTER_H_MM = 594;
+/* CUSTOMIZE: poster dimensions in mm — A2 landscape = 594 × 420 */
+const POSTER_W_MM = 594;
+const POSTER_H_MM = 420;
 
 /* ================================================================
-   CUSTOMIZE: Card content — one entry per poster section
-   Each card has: title, color (null|'orange'|'teal'|'purple'|'red'),
-   grow (true = fills remaining column space), body (JSX)
+   CUSTOMIZE: Card content
+   Each card: title, color (null|'orange'|'teal'|'purple'|'red'),
+              grow (true = fills remaining column space), body (JSX)
+
+   Standard patterns:
+   - Most cards benefit from a 💡 lightbulb remark — default to including one.
+     Skip only for pure figures or pure reference tables with no interpretive content.
+   - Use .hl for the card's key takeaway at the top
+   - Use .eq for equations (escape backslashes: \\frac not \frac)
+   - Use .steps for numbered sequences
+   - Use .roles for side-by-side concept comparisons
+   - Use CSS .flow-box for architecture diagrams (not SVG)
    ================================================================ */
 const CARD_REGISTRY = {
-  tldr: {
-    title: 'TL;DR',
+
+  motivation: {
+    title: 'Motivation — Why This Concept?',
     color: null,
     grow: false,
     body: (
       <>
-        <div className="hl"><p>FILL_IN: One-sentence summary of the paper.</p></div>
-        <ul>
-          <li><b>Contribution 1</b></li>
-          <li><b>Contribution 2</b></li>
-          <li><b>Contribution 3</b></li>
-        </ul>
+        <div className="hl">
+          <p>FILL_IN: <b>One-sentence answer</b> to "why does this exist?"</p>
+        </div>
+        <table>
+          <thead><tr><th>Approach</th><th>Key property</th><th>Limitation</th></tr></thead>
+          <tbody>
+            <tr><td>Old method</td><td>FILL_IN</td><td>FILL_IN</td></tr>
+            <tr><td><b>This method</b></td><td className="best">FILL_IN</td><td>FILL_IN</td></tr>
+          </tbody>
+        </table>
+        <p style={{marginTop:'1.5mm',fontSize:'calc(7.5pt * var(--font-scale))',color:'var(--text-light)',borderTop:'0.3mm solid #eee',paddingTop:'1mm'}}>
+          <span style={{color:'var(--orange)'}}>💡</span> FILL_IN: The non-obvious insight about <i>why</i> the old approach failed and what property the new one exploits.
+        </p>
       </>
     ),
   },
-  method: {
-    title: 'Method',
-    color: 'teal',
-    grow: true,
-    body: (
-      <>
-        <div className="fig"><div className="fig-wrap"><img src="architecture.png" alt="Method" /></div></div>
-        <ul>
-          <li>FILL_IN: Method detail 1</li>
-          <li>FILL_IN: Method detail 2</li>
-        </ul>
-        <div className="eq">{'$FILL\\_IN: key\\_equation$'}</div>
-      </>
-    ),
-  },
-  results: {
-    title: 'Results',
-    color: 'purple',
-    grow: true,
-    body: (
-      <div className="fig"><div className="fig-wrap"><img src="results.png" alt="Results" /></div>
-      <div className="cap"><b>FILL_IN:</b> Caption describing the results figure.</div></div>
-    ),
-  },
-  quant: {
-    title: 'Quantitative Results',
+
+  core: {
+    title: 'Core Idea',
     color: 'orange',
     grow: false,
     body: (
-      <table>
-        <thead><tr><th>Method</th><th>Metric 1</th><th>Metric 2</th></tr></thead>
-        <tbody>
-          <tr><td>Baseline</td><td>0.00</td><td>0.00</td></tr>
-          <tr><td><b>Ours</b></td><td className="best">0.00</td><td className="best">0.00</td></tr>
-        </tbody>
-      </table>
-    ),
-  },
-  concl: {
-    title: 'Conclusion & Links',
-    color: 'red',
-    grow: false,
-    body: (
       <>
-        <ul>
-          <li>FILL_IN: Takeaway 1</li>
-          <li>FILL_IN: Takeaway 2</li>
-        </ul>
-        <div className="links">
-          <div className="ll"><b>Project:</b> FILL_IN<br /><b>Code:</b> FILL_IN</div>
+        <div className="hl orange">
+          <p>FILL_IN: The single most important conceptual claim.</p>
         </div>
+        <div className="eq">{'$$FILL\\_IN: key\\_formula$$'}</div>
+        <div className="steps">
+          <div className="step">
+            <div className="step-num">1</div>
+            <p><b>Step:</b> FILL_IN description.</p>
+          </div>
+          <div className="step">
+            <div className="step-num">2</div>
+            <p><b>Step:</b> FILL_IN description.</p>
+          </div>
+          <div className="step">
+            <div className="step-num">3</div>
+            <p><b>Step:</b> FILL_IN description.</p>
+          </div>
+        </div>
+        <p style={{fontSize:'calc(7pt * var(--font-scale))',color:'var(--text-light)',borderTop:'0.3mm solid #eee',paddingTop:'1mm',marginTop:'0.5mm'}}>
+          <span style={{color:'var(--orange)'}}>💡</span> FILL_IN: The algebraic or geometric intuition behind the formula — what does it actually compute?
+        </p>
       </>
     ),
   },
+
+  concepts: {
+    title: 'Key Concepts Compared',
+    color: 'teal',
+    grow: false,
+    body: (
+      <>
+        <div className="roles">
+          <div className="role-box q">
+            <div className="rl">Concept A</div>
+            <p><i>FILL_IN: role or meaning</i></p>
+          </div>
+          <div className="role-box k">
+            <div className="rl">Concept B</div>
+            <p><i>FILL_IN: role or meaning</i></p>
+          </div>
+          <div className="role-box v">
+            <div className="rl">Concept C</div>
+            <p><i>FILL_IN: role or meaning</i></p>
+          </div>
+        </div>
+        <ul>
+          <li>FILL_IN: important property</li>
+          <li>FILL_IN: important property</li>
+        </ul>
+        <p style={{fontSize:'calc(7pt * var(--font-scale))',color:'var(--text-light)',borderTop:'0.3mm solid #eee',paddingTop:'1mm',marginTop:'1mm'}}>
+          <span style={{color:'var(--teal)'}}>💡</span> FILL_IN: The distinction that most people confuse, and why it matters.
+        </p>
+      </>
+    ),
+  },
+
+  architecture: {
+    title: 'Architecture — Data Flow',
+    color: 'teal',
+    grow: false,
+    body: (
+      <>
+        {/* CSS flow diagram — preferred over SVG for linear architectures */}
+        <div style={{display:'flex',alignItems:'stretch',gap:'1mm',width:'100%',fontSize:'calc(6.5pt * var(--font-scale))',margin:'1mm 0',flexShrink:0}}>
+          <div className="flow-box input-box" style={{flex:1,padding:'4mm 2mm',display:'flex',alignItems:'center',justifyContent:'center',textAlign:'center'}}>Input</div>
+          <span style={{display:'flex',alignItems:'center',color:'var(--text-light)',fontWeight:800,padding:'0 1mm'}}>→</span>
+          <div className="flow-box attn-box" style={{flex:2,padding:'4mm 2mm',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',textAlign:'center',gap:'.4mm'}}>
+            <span style={{fontWeight:800}}>FILL_IN Block</span>
+            <span style={{fontSize:'calc(5.5pt * var(--font-scale))',opacity:.85}}>detail</span>
+          </div>
+          <span style={{display:'flex',alignItems:'center',color:'var(--text-light)',fontWeight:800,padding:'0 1mm'}}>→</span>
+          <div className="flow-box ffn-box" style={{flex:1,padding:'4mm 2mm',display:'flex',alignItems:'center',justifyContent:'center',textAlign:'center'}}>FFN</div>
+          <span style={{display:'flex',alignItems:'center',color:'var(--text-light)',fontWeight:800,padding:'0 1mm'}}>→</span>
+          <div className="flow-box out-box" style={{flex:1,padding:'4mm 2mm',display:'flex',alignItems:'center',justifyContent:'center',textAlign:'center'}}>Output</div>
+        </div>
+        <div className="hl teal">
+          <p style={{fontSize:'calc(7.5pt * var(--font-scale))'}}>
+            FILL_IN: Explanation of what each block does and why the order matters.
+          </p>
+        </div>
+        <p style={{fontSize:'calc(7pt * var(--font-scale))',color:'var(--text-light)',borderTop:'0.3mm solid #eee',paddingTop:'1mm',marginTop:'1mm'}}>
+          <span style={{color:'var(--teal)'}}>💡</span> FILL_IN: The subtle design choice in the architecture that is easy to miss.
+        </p>
+      </>
+    ),
+  },
+
+  example: {
+    title: 'Example Application',
+    color: 'blue',
+    grow: true,
+    body: (
+      <>
+        <div className="fig">
+          <div className="fig-wrap"><img src="example.png" alt="Example diagram" /></div>
+          <div className="cap"><b>FILL_IN.</b> Caption describing the figure.</div>
+        </div>
+        <p style={{fontSize:'calc(7pt * var(--font-scale))',color:'var(--text-light)',borderTop:'0.3mm solid #eee',paddingTop:'1mm',marginTop:'1mm'}}>
+          <span style={{color:'var(--blue)'}}>💡</span> FILL_IN: What this concrete example reveals about the general concept.
+        </p>
+      </>
+    ),
+  },
+
 };
 
 /* ================================================================
-   CUSTOMIZE: Default layout — column widths and card ordering
-   Assign cards to columns based on image aspect ratios:
-   - Wide images (>2:1) → widest column
-   - Square images (~1:1) → narrow columns
-   - Portrait images (<1:1) → narrowest column
-   Set widthMm to null for the flexible (center) column.
+   CUSTOMIZE: Default layout — columns and card order.
+   widthMm: fixed width in mm; null = flexible (takes remaining space).
+   At least one card per column should have grow:true to fill space.
    ================================================================ */
 const DEFAULT_LAYOUT = {
   columns: [
-    { id: 'col1', widthMm: 280, cards: ['tldr', 'method'] },
-    { id: 'col2', widthMm: null, cards: ['results'] },
-    { id: 'col3', widthMm: 220, cards: ['quant', 'concl'] },
+    { id:'col1', widthMm:null, cards:['motivation','core','concepts'] },
+    { id:'col2', widthMm:null, cards:['architecture','example'] },
   ],
 };
 const DEFAULT_CARD_HEIGHTS = {};
 const DEFAULT_FONT_SCALE = 1.3;
 
-/* CUSTOMIZE: Logos — save files to poster/logos/ */
-const DEFAULT_LOGOS = [
-  /* { src: 'logos/institution.png', alt: 'Institution', heightMm: 28 }, */
-];
-
 /* ================================================================
-   FRAMEWORK CODE — generally don't need to modify below this line
+   FRAMEWORK — no need to modify below this line
    ================================================================ */
 
-function cloneLayout(layout) {
-  return { columns: layout.columns.map(c => ({ id: c.id, widthMm: c.widthMm, cards: [...c.cards] })) };
+function cloneLayout(layout){
+  return { columns: layout.columns.map(c=>({id:c.id,widthMm:c.widthMm,cards:[...c.cards]})) };
 }
-
 const LS_KEY = 'posterConfig';
-function getFullConfig(layout, cardHeights, fontScale, logos) {
-  return { columns: layout.columns, cardHeights, fontScale, logos };
+function getFullConfig(layout,cardHeights,fontScale,logos){
+  return { columns:layout.columns, cardHeights, fontScale, logos };
 }
-function loadInitialConfig() {
-  try { const s = localStorage.getItem(LS_KEY); if (s) return JSON.parse(s); } catch(e) {}
+function loadInitialConfig(){
+  try { const s=localStorage.getItem(LS_KEY); if(s) return JSON.parse(s); } catch(e) {}
   return null;
 }
 const INIT_CONFIG = loadInitialConfig();
 
-function PosterApp() {
-  const [layout, setLayout] = useState(INIT_CONFIG ? cloneLayout({columns: INIT_CONFIG.columns}) : cloneLayout(DEFAULT_LAYOUT));
-  const [selectedCard, setSelectedCard] = useState(null);
-  const [cardHeights, setCardHeights] = useState(INIT_CONFIG?.cardHeights || {...DEFAULT_CARD_HEIGHTS});
-  const [preview, setPreview] = useState(false);
-  const [logos, setLogos] = useState(INIT_CONFIG?.logos || DEFAULT_LOGOS);
-  const [fontScale, setFontScaleState] = useState(INIT_CONFIG?.fontScale || DEFAULT_FONT_SCALE);
+function PosterApp(){
+  const [layout,setLayout] = useState(INIT_CONFIG ? cloneLayout({columns:INIT_CONFIG.columns}) : cloneLayout(DEFAULT_LAYOUT));
+  const [selectedCard,setSelectedCard] = useState(null);
+  const [cardHeights,setCardHeights] = useState(INIT_CONFIG?.cardHeights || {...DEFAULT_CARD_HEIGHTS});
+  const [preview,setPreview] = useState(false);
+  const [logos,setLogos] = useState(INIT_CONFIG?.logos || []);
+  const [fontScale,setFontScaleState] = useState(INIT_CONFIG?.fontScale || DEFAULT_FONT_SCALE);
   const currentScaleRef = useRef(1);
   const posterRef = useRef(null);
 
-  useEffect(() => { const cfg = getFullConfig(layout, cardHeights, fontScale, logos); localStorage.setItem(LS_KEY, JSON.stringify(cfg)); }, [layout, cardHeights, fontScale, logos]);
-  useEffect(() => { document.documentElement.style.setProperty('--font-scale', fontScale); }, [fontScale]);
-  useEffect(() => { document.body.classList.toggle('preview', preview); }, [preview]);
+  useEffect(()=>{ const cfg=getFullConfig(layout,cardHeights,fontScale,logos); localStorage.setItem(LS_KEY,JSON.stringify(cfg)); },[layout,cardHeights,fontScale,logos]);
+  useEffect(()=>{ document.documentElement.style.setProperty('--font-scale',fontScale); },[fontScale]);
+  useEffect(()=>{ document.body.classList.toggle('preview',preview); },[preview]);
 
-  const fit = useCallback(() => {
-    if (window.matchMedia('print').matches) return;
-    const pW = POSTER_W_MM * MM, pH = POSTER_H_MM * MM;
-    const scale = Math.min(window.innerWidth / pW, window.innerHeight / pH);
-    currentScaleRef.current = scale;
-    const left = (window.innerWidth - pW * scale) / 2;
-    const top = (window.innerHeight - pH * scale) / 2;
-    document.body.style.transform = 'translate(' + left + 'px,' + top + 'px) scale(' + scale + ')';
-  }, []);
-  useEffect(() => { fit(); window.addEventListener('resize', fit); return () => window.removeEventListener('resize', fit); }, [fit]);
+  const fit = useCallback(()=>{
+    if(window.matchMedia('print').matches) return;
+    const pW=POSTER_W_MM*MM, pH=POSTER_H_MM*MM;
+    const scale=Math.min(window.innerWidth/pW, window.innerHeight/pH);
+    currentScaleRef.current=scale;
+    const left=(window.innerWidth-pW*scale)/2;
+    const top=(window.innerHeight-pH*scale)/2;
+    document.body.style.transform='translate('+left+'px,'+top+'px) scale('+scale+')';
+  },[]);
+  useEffect(()=>{ fit(); window.addEventListener('resize',fit); return ()=>window.removeEventListener('resize',fit); },[fit]);
+  useEffect(()=>{ if(typeof renderMathInElement==='function') renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]}); });
 
-  useEffect(() => { if (typeof renderMathInElement === 'function') renderMathInElement(document.body, {delimiters: [{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]}); });
+  useEffect(()=>{
+    function handler(e){ if(selectedCard && !e.target.closest('.swap-handle') && !e.target.closest('.drop-zone')) setSelectedCard(null); }
+    document.addEventListener('click',handler); return ()=>document.removeEventListener('click',handler);
+  },[selectedCard]);
 
-  useEffect(() => {
-    function handler(e) { if (selectedCard && !e.target.closest('.swap-handle') && !e.target.closest('.drop-zone')) setSelectedCard(null); }
-    document.addEventListener('click', handler); return () => document.removeEventListener('click', handler);
-  }, [selectedCard]);
-
-  function swapCards(id1, id2) {
-    if (id1 === id2) return false;
-    setLayout(prev => { const next = cloneLayout(prev); let l1, l2; for (const c of next.columns) { const i1 = c.cards.indexOf(id1); if (i1!==-1) l1={col:c,idx:i1}; const i2 = c.cards.indexOf(id2); if (i2!==-1) l2={col:c,idx:i2}; } if (!l1||!l2) return prev; l1.col.cards[l1.idx]=id2; l2.col.cards[l2.idx]=id1; return next; });
-    setCardHeights(prev => { const n={...prev}; delete n[id1]; delete n[id2]; return n; });
+  function swapCards(id1,id2){
+    if(id1===id2) return false;
+    setLayout(prev=>{ const next=cloneLayout(prev); let l1,l2; for(const c of next.columns){ const i1=c.cards.indexOf(id1); if(i1!==-1) l1={col:c,idx:i1}; const i2=c.cards.indexOf(id2); if(i2!==-1) l2={col:c,idx:i2}; } if(!l1||!l2) return prev; l1.col.cards[l1.idx]=id2; l2.col.cards[l2.idx]=id1; return next; });
+    setCardHeights(prev=>{ const n={...prev}; delete n[id1]; delete n[id2]; return n; });
     return true;
   }
-  function moveCard(cardId, targetColId, position) {
-    setLayout(prev => { const next = cloneLayout(prev); for (const c of next.columns) { const i = c.cards.indexOf(cardId); if (i!==-1) { c.cards.splice(i,1); break; } } const tc = next.columns.find(c=>c.id===targetColId); if (!tc) return prev; tc.cards.splice(Math.max(0,Math.min(position,tc.cards.length)),0,cardId); return next; });
-    setCardHeights(prev => { const n={...prev}; delete n[cardId]; return n; });
+  function moveCard(cardId,targetColId,position){
+    setLayout(prev=>{ const next=cloneLayout(prev); for(const c of next.columns){ const i=c.cards.indexOf(cardId); if(i!==-1){ c.cards.splice(i,1); break; } } const tc=next.columns.find(c=>c.id===targetColId); if(!tc) return prev; tc.cards.splice(Math.max(0,Math.min(position,tc.cards.length)),0,cardId); return next; });
+    setCardHeights(prev=>{ const n={...prev}; delete n[cardId]; return n; });
   }
-  function setColumnWidth(colId, widthMm) { setLayout(prev => { const next = cloneLayout(prev); const c = next.columns.find(c=>c.id===colId); if (!c) return prev; c.widthMm = widthMm; return next; }); }
-  function setCardHeight(cardId, heightMm) { setCardHeights(prev => ({...prev, [cardId]: heightMm})); }
-  function getWaste() { let total=0; const details=[]; document.querySelectorAll('.fig-wrap').forEach(fw => { const img=fw.querySelector('img'); if(!img)return; const fr=fw.getBoundingClientRect(),ir=img.getBoundingClientRect(); const wH=Math.abs(fr.height-ir.height),wW=Math.abs(fr.width-ir.width); total+=wH+wW; details.push({card:fw.closest('.card')?.dataset.id,wasteH:Math.round(wH),wasteW:Math.round(wW),pct:Math.round((wH+wW)/(fr.height+fr.width)*100)}); }); return {total:Math.round(total),details}; }
-  function getLayout() { const s=currentScaleRef.current; const r=[]; document.querySelectorAll('#poster > .col').forEach(col => { const cards=[]; col.querySelectorAll('.card').forEach(c => { const b=c.getBoundingClientRect(); cards.push({id:c.dataset.id,height:Math.round(b.height/s),heightMm:Math.round(b.height/s/MM),grow:c.classList.contains('grow')}); }); r.push({colId:col.id,widthPx:Math.round(col.getBoundingClientRect().width/s),widthMm:Math.round(col.getBoundingClientRect().width/s/MM),cards}); }); return r; }
+  function setColumnWidth(colId,widthMm){ setLayout(prev=>{ const next=cloneLayout(prev); const c=next.columns.find(c=>c.id===colId); if(!c) return prev; c.widthMm=widthMm; return next; }); }
+  function setCardHeight(cardId,heightMm){ setCardHeights(prev=>({...prev,[cardId]:heightMm})); }
+  function getWaste(){ let total=0; const details=[]; document.querySelectorAll('.fig-wrap').forEach(fw=>{ const img=fw.querySelector('img'); if(!img) return; const fr=fw.getBoundingClientRect(),ir=img.getBoundingClientRect(); const wH=Math.abs(fr.height-ir.height),wW=Math.abs(fr.width-ir.width); total+=wH+wW; details.push({card:fw.closest('.card')?.dataset.id,wasteH:Math.round(wH),wasteW:Math.round(wW),pct:Math.round((wH+wW)/(fr.height+fr.width)*100)}); }); return {total:Math.round(total),details}; }
+  function getLayout(){ const s=currentScaleRef.current; const r=[]; document.querySelectorAll('#poster > .col').forEach(col=>{ const cards=[]; col.querySelectorAll('.card').forEach(c=>{ const b=c.getBoundingClientRect(); cards.push({id:c.dataset.id,height:Math.round(b.height/s),heightMm:Math.round(b.height/s/MM),grow:c.classList.contains('grow')}); }); r.push({colId:col.id,widthPx:Math.round(col.getBoundingClientRect().width/s),widthMm:Math.round(col.getBoundingClientRect().width/s/MM),cards}); }); return r; }
+  function resetLayout(){ setLayout(cloneLayout(DEFAULT_LAYOUT)); setCardHeights({...DEFAULT_CARD_HEIGHTS}); setFontScaleState(DEFAULT_FONT_SCALE); setLogos([]); setSelectedCard(null); localStorage.removeItem(LS_KEY); }
+  function saveConfig(){ const cfg=getFullConfig(layout,cardHeights,fontScale,logos); const b=new Blob([JSON.stringify(cfg,null,2)+'\n'],{type:'application/json'}); const u=URL.createObjectURL(b); const a=document.createElement('a'); a.href=u; a.download='poster-config.json'; a.click(); URL.revokeObjectURL(u); }
+  function copyConfig(){ navigator.clipboard.writeText(JSON.stringify(getFullConfig(layout,cardHeights,fontScale,logos),null,2)).then(()=>alert('Config copied! Paste it to Claude.')); }
+  function setFontScale(s){ setFontScaleState(parseFloat(s)||1.3); }
 
-  function resetLayout() { setLayout(cloneLayout(DEFAULT_LAYOUT)); setCardHeights({...DEFAULT_CARD_HEIGHTS}); setFontScaleState(DEFAULT_FONT_SCALE); setLogos([...DEFAULT_LOGOS]); setSelectedCard(null); localStorage.removeItem(LS_KEY); }
-  function saveConfig() { const cfg=getFullConfig(layout,cardHeights,fontScale,logos); const b=new Blob([JSON.stringify(cfg,null,2)+'\n'],{type:'application/json'}); const u=URL.createObjectURL(b); const a=document.createElement('a'); a.href=u; a.download='poster-config.json'; a.click(); URL.revokeObjectURL(u); }
-  function copyConfig() { navigator.clipboard.writeText(JSON.stringify(getFullConfig(layout,cardHeights,fontScale,logos),null,2)).then(()=>alert('Config copied! Paste it to Claude.')); }
-  function setFontScale(s) { setFontScaleState(parseFloat(s)||1.3); }
+  useEffect(()=>{ window.posterAPI={ swapCards,moveCard,setColumnWidth,setCardHeight,setFontScale,getWaste,getLayout,getConfig:()=>getFullConfig(layout,cardHeights,fontScale,logos),resetLayout,saveConfig,copyConfig }; });
 
-  useEffect(() => { window.posterAPI = { swapCards, moveCard, setColumnWidth, setCardHeight, setFontScale, getWaste, getLayout, getConfig:()=>getFullConfig(layout,cardHeights,fontScale,logos), resetLayout, saveConfig, copyConfig }; });
+  function handleSwapClick(cardId,e){ e.stopPropagation(); if(!selectedCard) setSelectedCard(cardId); else if(selectedCard===cardId) setSelectedCard(null); else { swapCards(selectedCard,cardId); setSelectedCard(null); } }
+  function handleDropZone(targetColId,position,e){ e.stopPropagation(); if(!selectedCard) return; moveCard(selectedCard,targetColId,position); setSelectedCard(null); }
 
-  function handleSwapClick(cardId, e) { e.stopPropagation(); if (!selectedCard) setSelectedCard(cardId); else if (selectedCard===cardId) setSelectedCard(null); else { swapCards(selectedCard, cardId); setSelectedCard(null); } }
-  function handleDropZone(targetColId, position, e) { e.stopPropagation(); if (!selectedCard) return; moveCard(selectedCard, targetColId, position); setSelectedCard(null); }
-
-  function handleColResize(dividerIdx, e) {
+  function handleColResize(dividerIdx,e){
     e.preventDefault(); const handle=e.currentTarget; handle.classList.add('active');
-    const targetColIdx=dividerIdx===0?0:2; const invert=dividerIdx===0?1:-1;
+    const targetColIdx=0; const invert=1;
     const targetEl=document.getElementById(layout.columns[targetColIdx].id);
     const startX=e.clientX; const scale=currentScaleRef.current;
     const startW=targetEl.getBoundingClientRect().width/scale;
-    function onMove(ev) { const dx=(ev.clientX-startX)/scale*invert; const newW=Math.max(120,(startW+dx)/MM); setLayout(prev => { const next=cloneLayout(prev); next.columns[targetColIdx].widthMm=Math.round(newW); return next; }); }
-    function onUp() { document.removeEventListener('mousemove',onMove); document.removeEventListener('mouseup',onUp); handle.classList.remove('active'); document.body.style.cursor=''; }
+    function onMove(ev){ const dx=(ev.clientX-startX)/scale*invert; const newW=Math.max(120,(startW+dx)/MM); setLayout(prev=>{ const next=cloneLayout(prev); next.columns[targetColIdx].widthMm=Math.round(newW); return next; }); }
+    function onUp(){ document.removeEventListener('mousemove',onMove); document.removeEventListener('mouseup',onUp); handle.classList.remove('active'); document.body.style.cursor=''; }
     document.body.style.cursor='col-resize'; document.addEventListener('mousemove',onMove); document.addEventListener('mouseup',onUp);
   }
 
-  function handleRowResize(colId, cardAboveIdx, e) {
+  function handleRowResize(colId,cardAboveIdx,e){
     e.preventDefault(); const handle=e.currentTarget; handle.classList.add('active');
     const col=layout.columns.find(c=>c.id===colId); const aboveId=col.cards[cardAboveIdx];
-    const aboveEl=document.querySelector('[data-id="'+aboveId+'"]'); if(!aboveEl)return;
+    const aboveEl=document.querySelector('[data-id="'+aboveId+'"]'); if(!aboveEl) return;
     const startY=e.clientY; const scale=currentScaleRef.current; const startH=aboveEl.getBoundingClientRect().height/scale;
     setCardHeights(prev=>({...prev,[aboveId]:startH/MM}));
-    function onMove(ev) { const dy=(ev.clientY-startY)/scale; setCardHeights(prev=>({...prev,[aboveId]:Math.max(20,(startH+dy)/MM)})); }
-    function onUp() { document.removeEventListener('mousemove',onMove); document.removeEventListener('mouseup',onUp); handle.classList.remove('active'); document.body.style.cursor=''; }
+    function onMove(ev){ const dy=(ev.clientY-startY)/scale; setCardHeights(prev=>({...prev,[aboveId]:Math.max(20,(startH+dy)/MM)})); }
+    function onUp(){ document.removeEventListener('mousemove',onMove); document.removeEventListener('mouseup',onUp); handle.classList.remove('active'); document.body.style.cursor=''; }
     document.body.style.cursor='row-resize'; document.addEventListener('mousemove',onMove); document.addEventListener('mouseup',onUp);
   }
 
-  function isCardGrow(cardId) {
-    if (cardHeights[cardId] != null) return false;
-    for (const col of layout.columns) {
-      const idx = col.cards.indexOf(cardId); if (idx===-1) continue;
-      const hasGrower = col.cards.some(cid => CARD_REGISTRY[cid]?.grow && cardHeights[cid]==null);
-      if (hasGrower) return CARD_REGISTRY[cardId]?.grow || false;
-      const lastFlexible = [...col.cards].reverse().find(cid => cardHeights[cid]==null);
-      return cardId === lastFlexible;
+  function isCardGrow(cardId){
+    if(cardHeights[cardId]!=null) return false;
+    for(const col of layout.columns){
+      const idx=col.cards.indexOf(cardId); if(idx===-1) continue;
+      const hasGrower=col.cards.some(cid=>CARD_REGISTRY[cid]?.grow && cardHeights[cid]==null);
+      if(hasGrower) return CARD_REGISTRY[cardId]?.grow||false;
+      const lastFlexible=[...col.cards].reverse().find(cid=>cardHeights[cid]==null);
+      return cardId===lastFlexible;
     }
     return false;
   }
 
-  function renderCard(cardId) {
-    const card = CARD_REGISTRY[cardId]; if (!card) return null;
-    const classes = ['card']; if (card.color) classes.push(card.color); if (isCardGrow(cardId)) classes.push('grow'); if (selectedCard===cardId) classes.push('swap-selected');
-    const style = {}; if (cardHeights[cardId]!=null) style.flex='0 0 '+cardHeights[cardId]+'mm';
+  function renderCard(cardId){
+    const card=CARD_REGISTRY[cardId]; if(!card) return null;
+    const classes=['card']; if(card.color) classes.push(card.color); if(isCardGrow(cardId)) classes.push('grow'); if(selectedCard===cardId) classes.push('swap-selected');
+    const style={}; if(cardHeights[cardId]!=null) style.flex='0 0 '+cardHeights[cardId]+'mm';
     return (<div key={cardId} className={classes.join(' ')} data-id={cardId} style={style}><div className="swap-handle" onClick={(e)=>handleSwapClick(cardId,e)}>&#x2725;</div><h2>{card.title}</h2>{card.body}</div>);
   }
 
-  function renderDropZone(colId, position) {
-    const visible = selectedCard !== null;
+  function renderDropZone(colId,position){
+    const visible=selectedCard!==null;
     return (<div key={'dz-'+colId+'-'+position} className={'drop-zone'+(visible?' visible':'')} onClick={(e)=>handleDropZone(colId,position,e)}>{visible && <div className="drop-zone-inner" />}</div>);
   }
 
-  function renderColumn(col) {
-    const style = col.widthMm != null ? {flex:'0 0 '+col.widthMm+'mm'} : {flex:'1.5'};
-    const children = [renderDropZone(col.id, 0)];
-    col.cards.forEach((cardId, i) => {
+  function renderColumn(col){
+    const style=col.widthMm!=null ? {flex:'0 0 '+col.widthMm+'mm'} : {flex:'1'};
+    const children=[renderDropZone(col.id,0)];
+    col.cards.forEach((cardId,i)=>{
       children.push(renderCard(cardId));
-      if (i < col.cards.length - 1) children.push(<div key={'row-'+col.id+'-'+i} className="divider row-resize" onMouseDown={(e)=>handleRowResize(col.id,i,e)} />);
-      children.push(renderDropZone(col.id, i + 1));
+      if(i<col.cards.length-1) children.push(<div key={'row-'+col.id+'-'+i} className="divider row-resize" onMouseDown={(e)=>handleRowResize(col.id,i,e)} />);
+      children.push(renderDropZone(col.id,i+1));
     });
     return (<div key={col.id} className="col" id={col.id} style={style}>{children}</div>);
   }
@@ -374,37 +474,28 @@ function PosterApp() {
       <div className="toolbar">
         <button onClick={()=>setPreview(!preview)} style={preview?{background:'#2d7fc1',color:'#fff'}:{}}>{preview?'Edit':'Preview'}</button>
         {!preview && <>
-          <button onClick={()=>setFontScale(Math.max(0.8,fontScale-0.1))}>A-</button>
+          <button onClick={()=>setFontScale(Math.max(0.7,fontScale-0.1))}>A-</button>
           <button onClick={()=>setFontScale(fontScale+0.1)}>A+</button>
-          <button onClick={saveConfig} title="Download poster-config.json">Save</button>
-          <button onClick={copyConfig} title="Copy config JSON to clipboard">Copy Config</button>
+          <button onClick={saveConfig}>Save</button>
+          <button onClick={copyConfig}>Copy Config</button>
           <button onClick={resetLayout}>Reset</button>
         </>}
       </div>
 
-      {/* CUSTOMIZE: Header content */}
+      {/* CUSTOMIZE: Header — educational poster (no logos/QR by default) */}
       <div className="header">
         <div className="header-left">
-          <h1><span className="m">METHOD_NAME:</span> PAPER_TITLE</h1>
-          <div className="authors">FILL_IN_AUTHORS</div>
-          <div className="aff">FILL_IN_AFFILIATIONS</div>
-        </div>
-        {logos.length > 0 && (
-          <div className="header-logos">
-            {logos.map((logo, i) => (<img key={i} src={logo.src} alt={logo.alt} style={{height:(logo.heightMm||28)+'mm'}} />))}
-          </div>
-        )}
-        <div className="header-right">
-          <div className="badge">CONF 2026</div>
-          <div className="qr"><img src="qr.png" alt="QR" /><div className="ql">Project page</div></div>
-          <div className="qr"><img src="qr-posterskill.png" alt="Posterskill" /><div className="ql">Poster made with my Claude skill</div></div>
+          <h1>TOPIC_TITLE</h1>
+          <div className="sub">SUBTITLE — what aspect is explained</div>
+          <div className="authors">Based on AUTHOR (YEAR) &amp; AUTHOR et al. (YEAR)</div>
+          <div className="aff">source-url-1 · source-url-2</div>
         </div>
       </div>
 
       <div className="poster" id="poster" ref={posterRef}>
-        {layout.columns.map((col, colIdx) => {
-          const elements = [];
-          if (colIdx > 0) elements.push(<div key={'col-div-'+colIdx} className="divider col-resize" onMouseDown={(e)=>handleColResize(colIdx-1,e)} />);
+        {layout.columns.map((col,colIdx)=>{
+          const elements=[];
+          if(colIdx>0) elements.push(<div key={'col-div-'+colIdx} className="divider col-resize" onMouseDown={(e)=>handleColResize(colIdx-1,e)} />);
           elements.push(renderColumn(col));
           return elements;
         })}
@@ -413,7 +504,7 @@ function PosterApp() {
   );
 }
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
+const root=ReactDOM.createRoot(document.getElementById('root'));
 root.render(<PosterApp />);
 </script>
 </body>
