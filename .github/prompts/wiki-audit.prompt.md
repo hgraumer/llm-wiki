@@ -25,7 +25,7 @@ Three rules:
 1. Target is one of: [[source-slug]] (a source-type wiki page), raw/<file> or
    assets/<file> (a local file path), or a URL. Never an entity / concept /
    analysis page.
-2. A locator is present (§section, p.N, [HH:MM:SS], URL anchor, dated post).
+2. A locator is present (§section, p.N, [HH:MM:SS], URL anchor, dated post, or L<n>/L<n>-L<m> for a code line range).
 3. Either a verbatim quote, or the [synthesis] tag plus a description of what
    the cited range supports.
 ```

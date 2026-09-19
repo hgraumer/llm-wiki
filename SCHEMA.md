@@ -3,7 +3,7 @@
 ## Identity
 - **Path:** C:\Users\hgrau\llm-wiki
 - **Domain:** Personal knowledge base (Mathematics, Tech, AI, History and others)
-- **Source types:** papers, articles, transcripts, parts of books, URLs
+- **Source types:** papers, articles, transcripts, parts of books, URLs, code files (e.g. a Python script or notebook)
 - **Created:** 2026-05-03
 
 ## Page Frontmatter
@@ -125,7 +125,8 @@ Three rules for every footnote:
    Never cite entity, concept, or analysis pages — those are syntheses, not sources.
 
 2. **A locator is present:** `§<section>`, `p.<n>`, `[HH:MM:SS]` for transcripts,
-   URL anchor for web, or `(YYYY-MM-DD)` for dated posts.
+   URL anchor for web, `(YYYY-MM-DD)` for dated posts, or `L<n>` / `L<n>-L<m>`
+   for a line (range) in a code file.
 
 3. **Either a verbatim quote, or the `[synthesis]` tag plus a description** of
    what the cited range supports. No third option.
@@ -134,6 +135,7 @@ Three rules for every footnote:
 ```
 [^3]: raw/scaling-laws.pdf p.7 — "loss scales as a power law in compute"
 [^4]: https://twitter.com/user/status/123 (2026-04-15) — "<tweet text>"
+[^5]: raw/train.py L42-L48 — "loss = criterion(outputs, targets) / accum_steps"
 ```
 
 ## Log Entry Format

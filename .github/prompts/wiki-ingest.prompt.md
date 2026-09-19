@@ -19,7 +19,7 @@ Read `SCHEMA.md` to learn: wiki root path, page frontmatter format, cross-refere
 ### 1. Accept the source
 
 The source can be:
-- **File path** — read it directly; copy to `raw/<filename>` if not already there
+- **File path** — read it directly; copy to `raw/<filename>` if not already there. This includes code files (e.g. a `.py` script or notebook) — treat the code itself as the source to summarize and cite, the same as a paper or article.
 - **URL** — fetch its contents directly (e.g. via the `fetch` tool); save to `raw/<slug>.<ext>`
 - **Pasted text** — use what was provided
 
@@ -64,7 +64,7 @@ updated: <today>
 
 **Source:** <original URL or file path>
 **Date ingested:** <today>
-**Type:** <paper | article | transcript | book-excerpt | other>
+**Type:** <paper | article | transcript | book-excerpt | code | other>
 
 ## Summary
 
