@@ -1,6 +1,7 @@
 ---
-name: wiki-lint
+mode: agent
 description: Use when auditing a wiki for health issues — contradictions between pages, orphan pages, broken cross-references, stale claims, missing pages, or coverage gaps. Run after every 5-10 ingests.
+tools: ['codebase', 'search', 'editFiles']
 ---
 
 # Wiki Lint
@@ -9,7 +10,7 @@ Audit the wiki. Produce a categorized report. Offer concrete fixes. Log the oper
 
 ## Pre-condition
 
-Find `SCHEMA.md` (search from cwd upward, or `~/wikis/`). If not found, tell the user to run `wiki-init` first. Read it to get wiki root path and conventions.
+Find `SCHEMA.md` (search from cwd upward, or `~/wikis/`). If not found, tell the user to run `/wiki-init` first. Read it to get wiki root path and conventions.
 
 ## Process
 
@@ -81,7 +82,7 @@ updated: <today>
 
 ## 🔵 Missing Concept Pages
 - [[slug]] referenced N times but no page exists
-  Fix: run wiki-ingest or create a stub
+  Fix: run /wiki-ingest or create a stub
 
 ## 🔵 Coverage Gaps
 - Open question from overview.md: "<question>"

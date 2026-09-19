@@ -83,8 +83,8 @@ When you notice one, create a `Decisions` page immediately rather than noting it
 
 Codebases change. Keep the wiki current by:
 
-- Running `wiki-lint` after significant refactors to find stale claims
-- Using `wiki-update` when a module is renamed, split, or deleted
+- Running `/wiki-lint` after significant refactors to find stale claims
+- Using `/wiki-update` when a module is renamed, split, or deleted
 - Noting the approximate date or git ref a claim was verified: `> Verified ~2025-01`
 - Flagging pages with `stale: true` in frontmatter when you know they need revisiting
 

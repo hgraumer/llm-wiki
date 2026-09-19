@@ -1,18 +1,16 @@
 ---
-name: make-poster
+mode: agent
 description: Generate an HTML scientific teaching poster from a user instruction and the wiki knowledge base, printable to PDF
-argument-hint: <topic and any formatting notes>
-user-invocable: true
-allowed-tools: Read, Write, Edit, Bash, Glob, Grep, WebFetch, Agent
+tools: ['codebase', 'search', 'editFiles', 'runCommands', 'fetch']
 ---
 
 # Educational Teaching Poster Generator (HTML)
 
 You are a highly rewarded lecturer with excellent teaching skills, able to present even the hardest topics in an understandable way. You use formulas, diagrams and structured visual cues to support the reader's intuition.
 
-Generate a professional HTML teaching poster. User notes: $ARGUMENTS
+Generate a professional HTML teaching poster based on the topic and any formatting notes the user provided when invoking this prompt.
 
-The poster is a **React-based interactive editor** — a single self-contained HTML file. No build step needed (React/Babel loaded via CDN). The user can visually adjust the layout in their browser, then export the config back to Claude for further changes.
+The poster is a **React-based interactive editor** — a single self-contained HTML file. No build step needed (React/Babel loaded via CDN). The user can visually adjust the layout in their browser, then paste the exported config back into chat for further changes.
 
 Each poster lives in its own subfolder under `poster/` so finished posters are preserved.
 
@@ -28,7 +26,7 @@ Each poster lives in its own subfolder under `poster/` so finished posters are p
 │   ├── backpropagation/
 │   │   └── index.html
 │   └── ...
-└── .claude/skills/make-poster/
+└── .github/prompts/make-poster/
 ```
 
 ## Inputs
@@ -43,7 +41,7 @@ Derive a short kebab-case folder name from the topic (e.g. `attention-transforme
 
 ### Step 1: Collect content
 
-Use `wiki-query` to retrieve relevant wiki pages for the topic. Gather:
+Use `/wiki-query` (or read `wiki/` directly) to retrieve relevant wiki pages for the topic. Gather:
 - Core definitions and formulas
 - Intuitive explanations and analogies
 - Concrete examples (architectures, applications)
@@ -60,7 +58,7 @@ Plan the card structure. Prioritize:
 
 ### Step 3: Generate the poster HTML
 
-Use the template at `${CLAUDE_SKILL_DIR}/template.html` as a starting point.
+Use the template at `.github/prompts/make-poster/template.html` as a starting point.
 
 **Architecture:**
 - `CARD_REGISTRY` — defines each card's content (title, color, JSX body)
@@ -244,7 +242,7 @@ For self-educational posters, the header is simple — no logos, no QR codes:
 Five accent colors, each with a light variant for backgrounds:
 
 | Name   | Variable        | Light bg           | Use for                  |
-|--------|-----------------|--------------------|--------------------------|
+|--------|-----------------|--------------------|---------------------------|
 | blue   | `--blue`        | `--blue-light`     | default, primary concept |
 | orange | `--orange`      | `--orange-light`   | secondary, equations     |
 | teal   | `--teal`        | `--teal-light`     | derived concepts, output |
@@ -283,11 +281,11 @@ with sync_playwright() as p:
         wst = page.evaluate('window.posterAPI.getWaste().total')
         print(w, wst)
 
-    page.screenshot(path='/tmp/poster_check.png')
+    page.screenshot(path='poster_check.png')
     browser.close()
 ```
 
-Read `/tmp/poster_check.png` to visually inspect. Then bake best values into `DEFAULT_LAYOUT`, `DEFAULT_CARD_HEIGHTS`, `DEFAULT_FONT_SCALE`.
+Open `poster_check.png` to visually inspect. Then bake best values into `DEFAULT_LAYOUT`, `DEFAULT_CARD_HEIGHTS`, `DEFAULT_FONT_SCALE`.
 
 ---
 

@@ -404,7 +404,7 @@ function PosterApp(){
   function getLayout(){ const s=currentScaleRef.current; const r=[]; document.querySelectorAll('#poster > .col').forEach(col=>{ const cards=[]; col.querySelectorAll('.card').forEach(c=>{ const b=c.getBoundingClientRect(); cards.push({id:c.dataset.id,height:Math.round(b.height/s),heightMm:Math.round(b.height/s/MM),grow:c.classList.contains('grow')}); }); r.push({colId:col.id,widthPx:Math.round(col.getBoundingClientRect().width/s),widthMm:Math.round(col.getBoundingClientRect().width/s/MM),cards}); }); return r; }
   function resetLayout(){ setLayout(cloneLayout(DEFAULT_LAYOUT)); setCardHeights({...DEFAULT_CARD_HEIGHTS}); setFontScaleState(DEFAULT_FONT_SCALE); setLogos([]); setSelectedCard(null); localStorage.removeItem(LS_KEY); }
   function saveConfig(){ const cfg=getFullConfig(layout,cardHeights,fontScale,logos); const b=new Blob([JSON.stringify(cfg,null,2)+'\n'],{type:'application/json'}); const u=URL.createObjectURL(b); const a=document.createElement('a'); a.href=u; a.download='poster-config.json'; a.click(); URL.revokeObjectURL(u); }
-  function copyConfig(){ navigator.clipboard.writeText(JSON.stringify(getFullConfig(layout,cardHeights,fontScale,logos),null,2)).then(()=>alert('Config copied! Paste it to Claude.')); }
+  function copyConfig(){ navigator.clipboard.writeText(JSON.stringify(getFullConfig(layout,cardHeights,fontScale,logos),null,2)).then(()=>alert('Config copied! Paste it back into chat.')); }
   function setFontScale(s){ setFontScaleState(parseFloat(s)||1.3); }
 
   useEffect(()=>{ window.posterAPI={ swapCards,moveCard,setColumnWidth,setCardHeight,setFontScale,getWaste,getLayout,getConfig:()=>getFullConfig(layout,cardHeights,fontScale,logos),resetLayout,saveConfig,copyConfig }; });

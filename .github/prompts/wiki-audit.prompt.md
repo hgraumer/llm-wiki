@@ -1,17 +1,18 @@
 ---
-name: wiki-audit
+mode: agent
 description: Use when fact-checking a single wiki page against its cited sources — verifies that every footnote actually supports its claim and surfaces uncited factual claims. Run after ingesting a high-stakes page or any time you want confidence in one page's accuracy.
+tools: ['codebase', 'search', 'editFiles']
 ---
 
 # Wiki Audit
 
-Verify a single wiki page against its cited sources. Two phases: detect uncited factual claims, then verify cited claims by dispatching one subagent per source in parallel.
+Verify a single wiki page against its cited sources. Two phases: detect uncited factual claims, then verify cited claims by reading each cited source once and checking every footnote against it.
 
 ## Pre-condition
 
-Find `SCHEMA.md` (search from cwd upward, or `~/wikis/`). If not found, tell the user to run `wiki-init` first. Read `SCHEMA.md` for the wiki root path and the **Citations** section (the rules and footnote format the audit enforces).
+Find `SCHEMA.md` (search from cwd upward, or `~/wikis/`). If not found, tell the user to run `/wiki-init` first. Read `SCHEMA.md` for the wiki root path and the **Citations** section (the rules and footnote format the audit enforces).
 
-**If `SCHEMA.md` has no Citations section** (older wiki, initialized before this skill existed): use the fallback convention below for this run, and offer at the end to append the Citations section to `SCHEMA.md` so future operations stay consistent.
+**If `SCHEMA.md` has no Citations section** (older wiki, initialized before this prompt existed): use the fallback convention below for this run, and offer at the end to append the Citations section to `SCHEMA.md` so future operations stay consistent.
 
 ```
 Cite every non-common-knowledge factual claim. Granularity is paragraph or claim,
@@ -41,18 +42,13 @@ Read the full page. Note:
 
 If the page has zero footnotes but contains factual content, that is itself the audit result — every claim becomes a Phase A finding. Still run Phase A; skip Phase B.
 
-### 2. Phase A — uncited claim detection (1 subagent)
+### 2. Phase A — uncited claim detection
 
-Dispatch one subagent. Give it:
-- The full page contents.
-- The **Citations** section copied from `SCHEMA.md`.
-- The page's `sources:` list.
+Using the **Citations** section from `SCHEMA.md` and the page's `sources:` list, scan the page for every non-common-knowledge factual claim that lacks a footnote. Apply the SCHEMA.md "what to cite" rule: paragraph- or claim-level granularity, common knowledge exempt.
 
-Task: list every non-common-knowledge factual claim that lacks a footnote. Return a structured list of `(line number, claim text, suggested-source-from-the-sources-list-or-"unknown")`.
+Produce a structured list of `(line number, claim text, suggested-source-from-the-sources-list-or-"unknown")`.
 
-The subagent applies the SCHEMA.md "what to cite" rule: paragraph- or claim-level granularity, common knowledge exempt.
-
-### 3. Phase B — cited claim verification (N subagents, parallel)
+### 3. Phase B — cited claim verification
 
 For every footnote definition in the page, parse:
 - The **target** — one of `[[source-slug]]`, a path under `raw/`/`assets/`, or a URL.
@@ -65,20 +61,15 @@ For every footnote definition in the page, parse:
 - `raw/<file>` or `assets/<file>` → read the file directly.
 - `<URL>` → check whether a cached copy exists in `assets/` (filename derived from URL). If yes, read it. If not, mark the footnote `🚫 source-missing` (do not re-fetch — that belongs in the fix step).
 
-Any target that cannot be resolved gets verdict `🚫 source-missing`; do not dispatch a subagent for it.
+Any target that cannot be resolved gets verdict `🚫 source-missing`; skip verification for it.
 
-**Group resolvable footnotes by their resolved file** (multiple footnotes against the same PDF read it once). Dispatch one subagent **per file, in parallel** using the `Agent` tool. Each subagent gets:
-- The raw source content (from `raw/`, `assets/`, or cached URL).
-- The list of footnotes against that source — for each: number, locator, and either the verbatim quote or the `[synthesis]` description.
-- The verdict rubric below.
-
-Each subagent returns, per footnote, one verdict and a 1-line note:
+**Group resolvable footnotes by their resolved file** (multiple footnotes against the same PDF read it once). Process each file in turn: read it once, then check every footnote against it before moving to the next file. For each footnote, apply the verdict rubric below.
 
 - `✅ supported` — quote string-matches the source at the cited locator, or the `[synthesis]` description honestly summarizes the cited range.
 - `❌ unsupported` — quote not found at the cited locator, or the claim is contradicted by the source.
 - `⚠️ partial` — quote is paraphrased rather than verbatim (and lacks the `[synthesis]` tag), or the synthesis description overstates the cited range.
 
-For ❌ and ⚠️, the note must include what the source actually says, so the user can decide how to fix.
+For ❌ and ⚠️, note what the source actually says, so the user can decide how to fix.
 
 **Why per-source, not per-footnote:** PDFs are expensive to read. One read of a 30-page paper for five footnotes beats five reads.
 
@@ -123,7 +114,7 @@ updated: <today>
 - [^1], [^2], [^4], [^6], [^8] — all verified
 ```
 
-Add the report to `wiki/index.md` under the `Maintenance` category (create the category if it does not yet exist — `wiki-lint` uses the same category).
+Add the report to `wiki/index.md` under the `Maintenance` category (create the category if it does not yet exist — `/wiki-lint` uses the same category).
 
 ### 5. Offer concrete fixes
 
