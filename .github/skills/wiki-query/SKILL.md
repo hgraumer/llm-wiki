@@ -1,7 +1,6 @@
 ---
-mode: agent
+name: wiki-query
 description: Use when asking a question against a personal wiki built with wiki-init and wiki-ingest. Do not answer from general knowledge — always read the wiki pages first.
-tools: ['codebase', 'search', 'editFiles']
 ---
 
 # Wiki Query
@@ -10,7 +9,7 @@ Ask a question. Read the wiki. Synthesize with citations. Offer to file the answ
 
 ## Pre-condition
 
-Find `SCHEMA.md` (search from cwd upward, or `~/wikis/`). If not found, tell the user to run `/wiki-init` first. Read it to get wiki root path and cross-reference convention.
+Find `SCHEMA.md` (search from cwd upward, or `~/wikis/`). If not found, tell the user to run wiki-init first. Read it to get wiki root path and cross-reference convention.
 
 ## Process
 

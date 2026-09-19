@@ -1,7 +1,6 @@
 ---
-mode: agent
+name: wiki-init
 description: Use when bootstrapping a new personal wiki for any knowledge domain — research, codebase documentation, reading notes, competitive analysis, or any long-term knowledge accumulation project.
-tools: ['codebase', 'editFiles']
 ---
 
 # Wiki Init
@@ -22,14 +21,14 @@ Ask:
 3. **What types of sources will you add?** (papers, URLs, code files, transcripts, etc.)
 4. **What categories should `index.md` use?**
    - Research default: `Sources | Entities | Concepts | Analyses`
-   - Codebase default: `Modules | APIs | Decisions | Flows` — see `.github/prompts/wiki-init/codebase.md` for detailed codebase guidance
+   - Codebase default: `Modules | APIs | Decisions | Flows` — see `codebase.md` in this skill's directory for detailed codebase guidance
    - Or specify custom
 
 ### 2. Create directory structure
 
 ```
 <wiki-root>/
-├── SCHEMA.md         ← conventions + absolute path (how other prompts find the wiki)
+├── SCHEMA.md         ← conventions + absolute path (how other skills find the wiki)
 ├── raw/              ← immutable source documents (you add these, LLM never modifies)
 ├── wiki/
 │   ├── index.md      ← content catalog: every page, one-line summary, by category
@@ -93,7 +92,7 @@ Three rules for every footnote:
 
 1. **The cited target is one of three forms:**
    - `[[source-slug]]` — a source-type wiki page (preferred for sources you've
-     ingested via `/wiki-ingest`)
+     ingested via wiki-ingest)
    - `raw/<file>` or `assets/<file>` — a path to a local file (for drive-by
      citations where a synthesis page isn't worth creating)
    - `<URL>` — a live URL, tweet, or ephemeral source (no local copy required)
@@ -122,7 +121,7 @@ Operations: init, ingest, query, update, lint, audit
 <one per line, matching the user's chosen taxonomy>
 
 ## Conventions
-- raw/ is immutable — prompts never modify it
+- raw/ is immutable — skills never modify it
 - log.md is append-only — never rewritten, only appended
 - index.md is updated on every operation that adds or changes pages
 - All pages live flat in wiki/pages/ — no subdirectories
@@ -186,6 +185,6 @@ updated: <today>
 
 Tell the user:
 - Wiki initialized at `<path>`
-- Add sources to `raw/` manually, or run `/wiki-ingest` directly with a URL or file path
-- Run `/wiki-lint` periodically to keep the wiki healthy
-- `SCHEMA.md` is how all other prompts locate this wiki — do not move or delete it
+- Add sources to `raw/` manually, or ask to ingest a URL or file path directly (wiki-ingest)
+- Run wiki-lint periodically to keep the wiki healthy
+- `SCHEMA.md` is how all other skills locate this wiki — do not move or delete it

@@ -10,19 +10,19 @@ This is a personal Obsidian wiki (Mathematics, Tech, AI, History, and other doma
 
 ## Workflows
 
-Structured workflows for common operations live in `.github/prompts/` as prompt files, invoked with `/<name>` in Copilot Chat:
+Structured workflows for common operations live in `.github/skills/<name>/SKILL.md`. Copilot loads a skill automatically when the user's request matches its description — no slash command needed, just ask naturally:
 
-- `/wiki-init` — bootstrap a new wiki
-- `/wiki-ingest` — add a new source (paper, article, URL, transcript, file)
-- `/wiki-query` — ask a question against the wiki, grounded in its pages
-- `/wiki-update` — revise existing pages when knowledge changes
-- `/wiki-lint` — audit the wiki for broken links, orphan pages, contradictions, staleness
-- `/wiki-audit` — fact-check a single page's footnotes against its cited sources
-- `/make-poster` — generate an HTML teaching poster from the wiki knowledge base
+- `wiki-init` — bootstrap a new wiki
+- `wiki-ingest` — add a new source (paper, article, URL, transcript, file, or code)
+- `wiki-query` — ask a question against the wiki, grounded in its pages
+- `wiki-update` — revise existing pages when knowledge changes
+- `wiki-lint` — audit the wiki for broken links, orphan pages, contradictions, staleness
+- `wiki-audit` — fact-check a single page's footnotes against its cited sources
+- `make-poster` — generate an HTML teaching poster from the wiki knowledge base
 
 ## Conventions to always apply
 
 - Cross-reference wiki pages with `[[slug]]` (Obsidian wikilink), never markdown links, for anything inside `wiki/pages/`.
 - Every non-common-knowledge factual claim needs a footnote citation — see the **Citations** section in `SCHEMA.md` for the exact format.
 - `wiki/log.md` is append-only. `wiki/pages/` is flat — no subdirectories.
-- Never answer a wiki question from general knowledge alone — read the relevant pages first (see `/wiki-query`).
+- Never answer a wiki question from general knowledge alone — read the relevant pages first (see wiki-query).

@@ -1,7 +1,6 @@
 ---
-mode: agent
+name: wiki-audit
 description: Use when fact-checking a single wiki page against its cited sources — verifies that every footnote actually supports its claim and surfaces uncited factual claims. Run after ingesting a high-stakes page or any time you want confidence in one page's accuracy.
-tools: ['codebase', 'search', 'editFiles']
 ---
 
 # Wiki Audit
@@ -10,9 +9,9 @@ Verify a single wiki page against its cited sources. Two phases: detect uncited 
 
 ## Pre-condition
 
-Find `SCHEMA.md` (search from cwd upward, or `~/wikis/`). If not found, tell the user to run `/wiki-init` first. Read `SCHEMA.md` for the wiki root path and the **Citations** section (the rules and footnote format the audit enforces).
+Find `SCHEMA.md` (search from cwd upward, or `~/wikis/`). If not found, tell the user to run wiki-init first. Read `SCHEMA.md` for the wiki root path and the **Citations** section (the rules and footnote format the audit enforces).
 
-**If `SCHEMA.md` has no Citations section** (older wiki, initialized before this prompt existed): use the fallback convention below for this run, and offer at the end to append the Citations section to `SCHEMA.md` so future operations stay consistent.
+**If `SCHEMA.md` has no Citations section** (older wiki, initialized before this skill existed): use the fallback convention below for this run, and offer at the end to append the Citations section to `SCHEMA.md` so future operations stay consistent.
 
 ```
 Cite every non-common-knowledge factual claim. Granularity is paragraph or claim,
@@ -114,7 +113,7 @@ updated: <today>
 - [^1], [^2], [^4], [^6], [^8] — all verified
 ```
 
-Add the report to `wiki/index.md` under the `Maintenance` category (create the category if it does not yet exist — `/wiki-lint` uses the same category).
+Add the report to `wiki/index.md` under the `Maintenance` category (create the category if it does not yet exist — wiki-lint uses the same category).
 
 ### 5. Offer concrete fixes
 

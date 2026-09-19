@@ -1,7 +1,6 @@
 ---
-mode: agent
+name: wiki-update
 description: Use when revising existing wiki pages because knowledge has changed, a new piece of information updates or contradicts existing content, or the user wants to directly edit wiki content with LLM assistance.
-tools: ['codebase', 'search', 'editFiles']
 ---
 
 # Wiki Update
@@ -10,7 +9,7 @@ Revise existing wiki pages. Always show diffs before writing. Always log. Always
 
 ## Pre-condition
 
-Find `SCHEMA.md` (search from cwd upward, or `~/wikis/`). If not found, tell the user to run `/wiki-init` first. Read it to get wiki root path and conventions.
+Find `SCHEMA.md` (search from cwd upward, or `~/wikis/`). If not found, tell the user to run wiki-init first. Read it to get wiki root path and conventions.
 
 ## Process
 

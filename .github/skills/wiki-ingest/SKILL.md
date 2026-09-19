@@ -1,7 +1,6 @@
 ---
-mode: agent
+name: wiki-ingest
 description: Use when adding a new source to a wiki — a paper, article, URL, file, transcript, or any document. One ingest may touch 10-15 wiki pages.
-tools: ['codebase', 'search', 'editFiles', 'fetch']
 ---
 
 # Wiki Ingest
@@ -10,7 +9,7 @@ Add a source to the wiki. Read it, discuss with the user, write a summary page, 
 
 ## Pre-condition
 
-Search for `SCHEMA.md` starting from the current directory and upward, or in common wiki locations (`~/wikis/`). If not found, tell the user to run `/wiki-init` first.
+Search for `SCHEMA.md` starting from the current directory and upward, or in common wiki locations (`~/wikis/`). If not found, tell the user to run wiki-init first.
 
 Read `SCHEMA.md` to learn: wiki root path, page frontmatter format, cross-reference convention, log entry format, index category taxonomy.
 
@@ -20,7 +19,7 @@ Read `SCHEMA.md` to learn: wiki root path, page frontmatter format, cross-refere
 
 The source can be:
 - **File path** — read it directly; copy to `raw/<filename>` if not already there. This includes code files (e.g. a `.py` script or notebook) — treat the code itself as the source to summarize and cite, the same as a paper or article.
-- **URL** — fetch its contents directly (e.g. via the `fetch` tool); save to `raw/<slug>.<ext>`
+- **URL** — fetch its contents directly; save to `raw/<slug>.<ext>`
 - **Pasted text** — use what was provided
 
 ### 2. Read the source in full
@@ -117,7 +116,7 @@ Synthesis: [^N]: <target> <locator> [synthesis] — <what supports the claim>
   <URL>                — a live URL or post
 ```
 
-For the source being ingested, use `[[<this-source-slug>]]` — `/wiki-ingest`
+For the source being ingested, use `[[<this-source-slug>]]` — this ingest
 is creating that page now, so the target exists by the time the page is read.
 
 If you cannot produce either citation kind for a claim, you do not have a
